@@ -2,7 +2,15 @@
 
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
-import { bundles, colorways, getBundle, getColorway, type ColorwaySlug } from '@/content/product'
+import {
+  bundleQuantityRange,
+  bundleUnitPriceCents,
+  bundles,
+  colorways,
+  getBundle,
+  getColorway,
+  type ColorwaySlug,
+} from '@/content/product'
 import { site } from '@/lib/site'
 
 export type CartLine = {
@@ -52,12 +60,22 @@ export const useCart = create<CartState>()(
       remove: (id) => set((state) => ({ lines: state.lines.filter((l) => l.id !== id) })),
 
       setQuantity: (id, quantity) =>
-        set((state) => ({
-          lines:
-            quantity <= 0
-              ? state.lines.filter((l) => l.id !== id)
-              : state.lines.map((l) => (l.id === id ? { ...l, quantity: Math.min(quantity, 20) } : l)),
-        })),
+        set((state) => {
+          const line = state.lines.find((l) => l.id === id)
+          const bundle = line ? getBundle(line.bundleId) : undefined
+          // Chaque pack a ses bornes : 20 pour les packs fixes, 100 pour le
+          // pack en nombre, dont la quantité EST le nombre d'appareils.
+          const { min, max } = bundle ? bundleQuantityRange(bundle) : { min: 1, max: 20 }
+
+          if (quantity < min) {
+            return { lines: state.lines.filter((l) => l.id !== id) }
+          }
+          return {
+            lines: state.lines.map((l) =>
+              l.id === id ? { ...l, quantity: Math.min(quantity, max) } : l,
+            ),
+          }
+        }),
 
       clear: () => set({ lines: [] }),
       open: () => set({ isOpen: true }),
@@ -89,6 +107,10 @@ export type ResolvedLine = {
   colorNames: string[]
   unitPriceCents: number
   totalCents: number
+  /** Pack à quantité libre : la quantité de ligne est un nombre d'appareils. */
+  isBulk: boolean
+  /** Nombre total d'appareils que représente la ligne. */
+  deviceCount: number
 }
 
 export function resolveLine(line: CartLine): ResolvedLine | null {
@@ -98,19 +120,25 @@ export function resolveLine(line: CartLine): ResolvedLine | null {
   const colors = line.colorSlugs.map((slug) => getColorway(slug)).filter((c) => c !== undefined)
   if (colors.length !== bundle.quantity) return null
 
+  // Le prix unitaire vient toujours de `bundleUnitPriceCents` : sur le pack
+  // en nombre, il dépend de la quantité commandée.
+  const unitPriceCents = bundleUnitPriceCents(bundle, line.quantity)
+
   return {
     line,
     bundleName: bundle.name,
     colorNames: colors.map((c) => c.name),
-    unitPriceCents: bundle.priceCents,
-    totalCents: bundle.priceCents * line.quantity,
+    unitPriceCents,
+    totalCents: unitPriceCents * line.quantity,
+    isBulk: bundle.bulk !== undefined,
+    deviceCount: bundle.quantity * line.quantity,
   }
 }
 
 export function cartTotals(lines: CartLine[]) {
   const resolved = lines.map(resolveLine).filter((l) => l !== null)
   const subtotalCents = resolved.reduce((sum, l) => sum + l.totalCents, 0)
-  const itemCount = resolved.reduce((sum, l) => sum + l.line.quantity, 0)
+  const itemCount = resolved.reduce((sum, l) => sum + l.deviceCount, 0)
   const freeShipping = subtotalCents >= site.freeShippingThresholdCents
   const shippingCents = subtotalCents === 0 || freeShipping ? 0 : site.shippingFlatCents
 

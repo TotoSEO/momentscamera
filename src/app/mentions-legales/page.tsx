@@ -41,8 +41,8 @@ export default function MentionsLegalesPage() {
 
       <LegalSection title="3. Propriété intellectuelle">
         <p>
-          L’ensemble des éléments composant le site — textes, visuels, modèle tridimensionnel,
-          identité graphique, code source — est protégé par le droit de la propriété
+          L’ensemble des éléments composant le site (textes, visuels, modèle tridimensionnel,
+          identité graphique, code source) est protégé par le droit de la propriété
           intellectuelle. Toute reproduction, représentation ou adaptation, totale ou partielle,
           sans autorisation écrite préalable, est interdite.
         </p>

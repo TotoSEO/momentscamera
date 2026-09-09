@@ -52,10 +52,11 @@ ordre, ce qui couvre les deux cas.
 3. **Les objections gênantes en face.** La FAQ dit franchement que ce
    n’est pas un reflex et que la lumière basse le met en difficulté. Un
    client bien informé est moins cher qu’un colis retourné.
-4. **Aucun faux avis.** Les cartes de la section « avis » sont des
-   emplacements de démonstration, affichés comme tels tant que
-   `REVIEWS_ARE_DEMO` vaut `true`. Publier de faux avis est puni jusqu’à
-   300 000 € (art. L121-2 du Code de la consommation).
+4. **Aucun faux avis.** La section avis a été retirée du site plutôt que
+   remplie d’exemples : publier de faux avis est une pratique commerciale
+   trompeuse, punie jusqu’à 300 000 € (art. L121-2 du Code de la
+   consommation). Elle reviendra alimentée par une base Supabase, avec les
+   avis d’acheteurs réellement vérifiés.
 5. **Chaque promesse est un engagement.** « 30 jours pour changer d’avis »,
    « garantie 12 mois », « expédié sous 24 h » : si vous ne pouvez pas les
    tenir, changez-les dans `src/lib/site.ts` et `copy.ts` **avant**

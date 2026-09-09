@@ -41,7 +41,7 @@ export const problem = {
   title: 'On n’a jamais pris autant de photos. Ni gardé aussi peu de souvenirs.',
   body: [
     "Votre téléphone contient des milliers de photos. Vous en avez revu une trentaine. Les autres dorment dans une pellicule que personne n'ouvre jamais.",
-    "Et le pire, c'est le moment lui-même. Sortir le téléphone. Le déverrouiller. Fermer la notification qui vient de tomber. Ouvrir l'appareil photo. Cadrer. Recommencer parce que quelqu'un a cligné des yeux. Pendant ce temps, la scène est déjà passée — et vous n'y étiez plus vraiment.",
+    "Et le pire, c'est le moment lui-même. Sortir le téléphone. Le déverrouiller. Fermer la notification qui vient de tomber. Ouvrir l'appareil photo. Cadrer. Recommencer parce que quelqu'un a cligné des yeux. Pendant ce temps, la scène est déjà passée, et vous n'y étiez plus vraiment.",
   ],
   stats: [
     { value: '8 000', label: 'photos en moyenne sur un téléphone' },
@@ -51,9 +51,9 @@ export const problem = {
 }
 
 export const solution = {
-  kicker: 'Ce qu’on a fait',
+  kicker: 'Ce qu’on vous propose',
   title: 'Un appareil qui fait une seule chose. Très bien.',
-  body: "Pas d'appli à installer. Pas de compte à créer. Pas de fil d'actualité qui vous attend au réveil de l'écran. Il est déjà dans votre main parce qu'il est sur vos clés — et vos clés, vous les avez toujours. Vous appuyez, ça capture, vous rangez. Vous découvrez le résultat plus tard, comme avant.",
+  body: "Pas d'appli à installer. Pas de compte à créer. Pas de fil d'actualité qui vous attend au réveil de l'écran. Il est déjà dans votre main parce qu'il est sur vos clés, et vos clés, vous les avez toujours. Vous appuyez, ça capture, vous rangez. Vous découvrez le résultat plus tard, comme avant.",
   steps: [
     {
       n: '01',
@@ -84,7 +84,7 @@ export const benefits = [
   {
     emoji: '🎞️',
     title: 'Le grain qui rend tout vrai',
-    body: 'Ce n’est pas un reflex, et c’est exactement le sujet. Le rendu a le charme de l’argentique jetable — les photos ressemblent à des souvenirs, pas à des posts.',
+    body: 'Ce n’est pas un reflex, et c’est exactement le sujet. Le rendu a le charme de l’argentique jetable : les photos ressemblent à des souvenirs, pas à des posts.',
     color: 'red',
   },
   {
@@ -142,7 +142,7 @@ export const useCases = [
   {
     title: 'Au sport',
     before: 'Personne ne veut sortir son iPhone à 1 200 € sur un skate.',
-    after: 'Un appareil à 29,90 € qu’on accroche et qu’on oublie.',
+    after: 'Un appareil à 18,99 € qu’on accroche et qu’on oublie.',
     color: 'lime',
   },
   {
@@ -182,7 +182,7 @@ export const finalCta = {
   title: 'Le prochain moment qui vaut le coup arrive bientôt.',
   body: 'Il durera quelques secondes. Vous aurez soit un appareil dans la main, soit un téléphone à déverrouiller. À vous de voir.',
   cta: 'Je prends le mien',
-  micro: 'À partir de 29,90 € · 30 jours pour changer d’avis',
+  micro: 'À partir de 18,99 € · 30 jours pour changer d’avis',
 }
 
 export const productPage = {
@@ -193,7 +193,7 @@ export const productPage = {
     'Vidéo 1080p, photo jusqu’à 5 MP, autofocus',
     'Objectif grand-angle 130° et écran TFT 0,96 pouce',
     'Mémoire 1 Go intégrée, extensible en microSD',
-    'Charge et transfert USB-C — aucune appli à installer',
+    'Charge et transfert USB-C, aucune appli à installer',
     'Boîtier ABS, 26 g, œillet et anneau porte-clés métal',
   ],
   colorLabel: 'Choisissez votre couleur',

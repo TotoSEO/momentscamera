@@ -61,7 +61,7 @@ export function ThankYouClient() {
               Stripe n’est pas encore configuré : le tunnel a tourné en mode démonstration pour
               vérifier le parcours de bout en bout. Renseignez <code className="font-mono">STRIPE_SECRET_KEY</code>{' '}
               et <code className="font-mono">STRIPE_WEBHOOK_SECRET</code> dans votre fichier{' '}
-              <code className="font-mono">.env.local</code> pour encaisser réellement — la marche à
+              <code className="font-mono">.env.local</code> pour encaisser réellement. La marche à
               suivre est dans <code className="font-mono">docs/PAYMENTS.md</code>.
             </p>
           </div>
@@ -69,7 +69,7 @@ export function ThankYouClient() {
           <>
             <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-ink-soft">
               Votre commande est confirmée. Un e-mail de confirmation part à l’instant, et vous
-              recevrez le numéro de suivi dès l’expédition — comptez 3 à 5 jours ouvrés.
+              recevrez le numéro de suivi dès l’expédition, comptez 3 à 5 jours ouvrés.
             </p>
             <p className="mt-4 text-sm text-ink-soft">
               Une question ?{' '}

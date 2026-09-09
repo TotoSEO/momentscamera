@@ -11,7 +11,7 @@ export type FaqItem = { q: string; a: string }
 export const faq: FaqItem[] = [
   {
     q: 'La qualité photo est-elle vraiment bonne ?',
-    a: "Soyons directs : ce n'est pas un reflex, et ce n'est pas non plus le dernier iPhone. C'est un capteur minuscule qui filme en 1080p et photographie jusqu'à 5 MP, derrière un objectif grand-angle 130° avec autofocus. Le rendu a du grain, les couleurs sont franches, la lumière basse le met en difficulté malgré la LED d'appoint. C'est précisément ce qui plaît : les photos ressemblent à celles d'un appareil jetable, pas à une publicité. Si vous cherchez une qualité studio, ce produit n'est pas pour vous — et on préfère vous le dire avant.",
+    a: "Soyons directs : ce n'est pas un reflex, et ce n'est pas non plus le dernier iPhone. C'est un capteur minuscule qui filme en 1080p et photographie jusqu'à 5 MP, derrière un objectif grand-angle 130° avec autofocus. Le rendu a du grain, les couleurs sont franches, la lumière basse le met en difficulté malgré la LED d'appoint. C'est précisément ce qui plaît : les photos ressemblent à celles d'un appareil jetable, pas à une publicité. Si vous cherchez une qualité studio, ce produit n'est pas pour vous, et on préfère vous le dire avant.",
   },
   {
     q: 'Combien de temps tient la batterie ?',
@@ -27,11 +27,11 @@ export const faq: FaqItem[] = [
   },
   {
     q: 'Est-ce qu’il se connecte à mon téléphone ?',
-    a: "Il n'a ni Wi-Fi ni Bluetooth : pas d'appairage, pas d'appli. En revanche, son port USB-C permet de le brancher directement sur un téléphone Android ou un iPhone récent avec un câble USB-C, et de récupérer les fichiers comme depuis une clé. Sur un ordinateur, c'est immédiat. Ce choix est assumé — c'est lui qui permet ce format, ce prix et cette simplicité.",
+    a: "Il n'a ni Wi-Fi ni Bluetooth : pas d'appairage, pas d'appli. En revanche, son port USB-C permet de le brancher directement sur un téléphone Android ou un iPhone récent avec un câble USB-C, et de récupérer les fichiers comme depuis une clé. Sur un ordinateur, c'est immédiat. Ce choix est assumé : c'est lui qui permet ce format, ce prix et cette simplicité.",
   },
   {
     q: 'À quoi sert l’écran, s’il est si petit ?',
-    a: "L'écran TFT de 0,96 pouce — environ 2,4 cm de diagonale — sert à deux choses : cadrer avant d'appuyer, et revoir la dernière prise sur place. Il ne remplace pas l'écran d'un téléphone et ce n'est pas son rôle : il n'affiche que ce que voit l'objectif. C'est justement pour ça qu'on peut le sortir en soirée sans y perdre vingt minutes.",
+    a: "L'écran TFT de 0,96 pouce, soit environ 2,4 cm de diagonale, sert à deux choses : cadrer avant d'appuyer, et revoir la dernière prise sur place. Il ne remplace pas l'écran d'un téléphone et ce n'est pas son rôle : il n'affiche que ce que voit l'objectif. C'est justement pour ça qu'on peut le sortir en soirée sans y perdre vingt minutes.",
   },
   {
     q: 'Est-ce légal de filmer avec ?',
@@ -39,7 +39,7 @@ export const faq: FaqItem[] = [
   },
   {
     q: 'Est-il résistant ?',
-    a: "Le boîtier est en ABS renforcé, le même plastique que les manettes de jeu : à 26 g pour 6 cm, il encaisse les chutes de poche et les clés qui frottent. En revanche il n'est pas étanche — il supporte quelques gouttes, pas la piscine ni une averse prolongée.",
+    a: "Le boîtier est en ABS renforcé, le même plastique que les manettes de jeu : à 26 g pour 6 cm, il encaisse les chutes de poche et les clés qui frottent. En revanche il n'est pas étanche : il supporte quelques gouttes, pas la piscine ni une averse prolongée.",
   },
   {
     q: 'Quels sont les délais de livraison ?',
@@ -47,7 +47,7 @@ export const faq: FaqItem[] = [
   },
   {
     q: 'Et si ça ne me plaît pas ?',
-    a: "Vous avez 30 jours pour nous le renvoyer et être remboursé — le délai légal de rétractation est de 14 jours, nous le doublons. L'appareil doit simplement revenir complet et en état de fonctionner. On ne demande pas de justification.",
+    a: "Vous avez 30 jours pour nous le renvoyer et être remboursé. Le délai légal de rétractation est de 14 jours, nous le doublons. L'appareil doit simplement revenir complet et en état de fonctionner. On ne demande pas de justification.",
   },
   {
     q: 'Y a-t-il une garantie ?',

@@ -73,7 +73,7 @@ export function CartPageClient() {
 
       {cancelled && (
         <p className="mt-6 rounded-[1.5rem] border-3 border-ink bg-pop-yellow px-6 py-4 font-semibold">
-          Paiement interrompu — rien n’a été débité. Votre panier vous attend.
+          Paiement interrompu, rien n’a été débité. Votre panier vous attend.
         </p>
       )}
 
@@ -198,7 +198,7 @@ export function CartPageClient() {
 
             {isStaticPreview ? (
               <div className="mt-6 rounded-[1.5rem] border-3 border-dashed border-ink bg-pop-yellow/60 px-5 py-4 text-sm leading-relaxed">
-                <p className="font-display font-bold">Aperçu — paiement indisponible</p>
+                <p className="font-display font-bold">Aperçu : paiement indisponible</p>
                 <p className="mt-1.5">
                   Cette version est hébergée sur un serveur de fichiers statiques, qui ne peut pas
                   exécuter le tunnel de paiement. La boutique complète fonctionne dès qu’elle est
@@ -237,7 +237,7 @@ export function CartPageClient() {
               <Link href={routes.cgv} className="underline underline-offset-2">
                 conditions générales de vente
               </Link>
-              . Paiement traité par Stripe — {site.name} ne conserve aucune donnée bancaire.
+              . Paiement traité par Stripe. {site.name} ne conserve aucune donnée bancaire.
             </p>
           </aside>
         </div>

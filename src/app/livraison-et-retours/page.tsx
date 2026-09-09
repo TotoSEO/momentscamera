@@ -1,0 +1,73 @@
+import type { Metadata } from 'next'
+import Link from 'next/link'
+import { LegalLayout, LegalSection } from '@/components/LegalLayout'
+import { formatPrice, routes, site } from '@/lib/site'
+
+export const metadata: Metadata = {
+  title: 'Livraison et retours',
+  description: 'Délais, tarifs de livraison, procédure de retour et de remboursement.',
+  alternates: { canonical: '/livraison-et-retours' },
+}
+
+export default function LivraisonPage() {
+  return (
+    <LegalLayout title="Livraison et retours" updatedAt="9 septembre 2026" draft={false}>
+      <LegalSection title="Délais et tarifs">
+        <ul className="ml-5 list-disc space-y-2">
+          <li>France métropolitaine : 3 à 5 jours ouvrés, avec suivi.</li>
+          <li>Belgique, Luxembourg, Suisse et Union européenne : 5 à 8 jours ouvrés.</li>
+          <li>
+            Frais : {formatPrice(site.shippingFlatCents)}, offerts dès{' '}
+            {formatPrice(site.freeShippingThresholdCents)} d’achat.
+          </li>
+          <li>Expédition sous 24 heures ouvrées après confirmation du paiement.</li>
+        </ul>
+        <p>
+          Le numéro de suivi est envoyé par courriel dès la remise du colis au transporteur.
+        </p>
+      </LegalSection>
+
+      <LegalSection title="Colis perdu ou endommagé">
+        <p>
+          Si le colis n’est pas arrivé sept jours après la date de livraison annoncée, écrivez à{' '}
+          {site.email} avec votre numéro de commande : nous ouvrons une enquête auprès du
+          transporteur et réexpédions si nécessaire. En cas de produit endommagé à la réception, une
+          photo suffit — nous remplaçons sans retour préalable.
+        </p>
+      </LegalSection>
+
+      <LegalSection title="Retour et remboursement">
+        <p>
+          Vous avez <strong>trente jours</strong> à compter de la réception pour changer d’avis. Le
+          délai légal de rétractation est de {site.returnWindowDays} jours : nous le doublons de
+          notre propre initiative.
+        </p>
+        <ol className="ml-5 list-decimal space-y-2">
+          <li>Écrivez à {site.email} en indiquant votre numéro de commande.</li>
+          <li>Nous vous envoyons une étiquette de retour prépayée.</li>
+          <li>Renvoyez l’appareil complet, avec son câble, dans un emballage protecteur.</li>
+          <li>
+            Le remboursement est effectué sous quatorze jours après réception, sur le moyen de
+            paiement d’origine.
+          </li>
+        </ol>
+        <p className="text-sm text-ink-soft">
+          Aucun justificatif n’est demandé. Un appareil visiblement endommagé par une mauvaise
+          utilisation peut faire l’objet d’une décote, conformément à l’article L221-23 du Code de
+          la consommation.
+        </p>
+      </LegalSection>
+
+      <LegalSection title="Garantie">
+        <p>
+          Chaque appareil est garanti {site.warrantyMonths} mois contre les défauts de fabrication,
+          en plus des garanties légales détaillées dans les{' '}
+          <Link href={routes.cgv} className="underline underline-offset-2">
+            conditions générales de vente
+          </Link>
+          .
+        </p>
+      </LegalSection>
+    </LegalLayout>
+  )
+}

@@ -1,0 +1,295 @@
+'use client'
+
+import { AnimatePresence, motion } from 'motion/react'
+import { useEffect, useMemo, useState } from 'react'
+import Link from 'next/link'
+import { ProductViewer } from '@/components/product/ProductViewer'
+import { ColorPicker } from '@/components/product/ColorPicker'
+import { BundlePicker } from '@/components/product/BundlePicker'
+import { Button } from '@/components/ui/Button'
+import { Badge } from '@/components/ui/Badge'
+import { VideoBlock } from '@/components/ui/VideoBlock'
+import { useCart } from '@/lib/cart-store'
+import { formatPrice, routes, site } from '@/lib/site'
+import { useSearchParam } from '@/lib/client-state'
+import {
+  bundles,
+  colorways,
+  defaultColorway,
+  getBundle,
+  specs,
+  type Bundle,
+  type ColorwaySlug,
+} from '@/content/product'
+import { productPage } from '@/content/copy'
+
+/**
+ * Fiche produit.
+ *
+ * Structure : visuel 3D collant à gauche, boîte d'achat à droite,
+ * puis les blocs de réassurance en dessous. Sur mobile, une barre
+ * d'achat apparaît dès que la boîte principale sort de l'écran —
+ * c'est là que se joue l'essentiel du chiffre d'affaires.
+ */
+export function ProductPageClient() {
+  // Le pack choisi dans la grille d'offres de l'accueil arrive en `?pack=`.
+  // Lu via un store externe pour que la page reste entièrement statique et
+  // qu'aucun état ne soit synchronisé dans un effet.
+  const packFromUrl = useSearchParam('pack')
+  const [pickedBundle, setPickedBundle] = useState<Bundle['id'] | null>(null)
+
+  const bundleId: Bundle['id'] =
+    pickedBundle ??
+    (packFromUrl && bundles.some((b) => b.id === packFromUrl) ? (packFromUrl as Bundle['id']) : 'duo')
+
+  const bundle = getBundle(bundleId) ?? bundles[0]
+
+  // Un seul tableau, dimensionné pour le plus gros pack. On n'en montre que
+  // les `bundle.quantity` premières entrées : plus rien à resynchroniser
+  // quand le client change de pack, et son choix de couleurs est conservé.
+  const maxUnits = Math.max(...bundles.map((b) => b.quantity))
+  const [colorPool, setColorPool] = useState<ColorwaySlug[]>(() =>
+    Array.from({ length: maxUnits }, () => defaultColorway.slug),
+  )
+  const selectedColors = colorPool.slice(0, bundle.quantity)
+
+  const [justAdded, setJustAdded] = useState(false)
+  const [showStickyBar, setShowStickyBar] = useState(false)
+
+  const add = useCart((s) => s.add)
+
+  // Barre d'achat mobile, pilotée par la visibilité de la boîte principale.
+  useEffect(() => {
+    const target = document.getElementById('buy-box')
+    if (!target) return
+    const observer = new IntersectionObserver(([entry]) => setShowStickyBar(!entry.isIntersecting), {
+      threshold: 0,
+    })
+    observer.observe(target)
+    return () => observer.disconnect()
+  }, [])
+
+  const previewColorway = useMemo(
+    () => colorways.find((c) => c.slug === colorPool[0]) ?? defaultColorway,
+    [colorPool],
+  )
+
+  const unitPrice = Math.round(bundle.priceCents / bundle.quantity)
+  const saving = bundle.compareAtCents - bundle.priceCents
+
+  function handleAdd() {
+    add(bundle.id, selectedColors)
+    setJustAdded(true)
+    setTimeout(() => setJustAdded(false), 2200)
+  }
+
+  return (
+    <>
+      <div className="mx-auto max-w-7xl px-4 pt-8 pb-20 md:px-8 md:pt-12">
+        <nav aria-label="Fil d’Ariane" className="mb-6 font-mono text-xs text-ink-soft">
+          <Link href={routes.home} className="underline-offset-2 hover:underline">
+            Accueil
+          </Link>
+          <span className="mx-2">/</span>
+          <span aria-current="page">Appareil photo porte-clés</span>
+        </nav>
+
+        <div className="grid gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-14">
+          {/* ---------------- Visuel ---------------- */}
+          <div className="lg:sticky lg:top-24 lg:self-start">
+            <div className="relative overflow-hidden rounded-[2.5rem] border-3 border-ink bg-cream-deep shadow-pop">
+              <div className="pointer-events-none absolute inset-0 -z-0 opacity-60" aria-hidden>
+                <div className="animate-blob absolute -top-16 -left-16 size-72 bg-pop-yellow/70 blur-3xl" />
+                <div
+                  className="animate-blob absolute -right-16 -bottom-16 size-72 bg-pop-blue/40 blur-3xl"
+                  style={{ animationDelay: '-6s' }}
+                />
+              </div>
+
+              <ProductViewer colorway={previewColorway} className="relative z-10 aspect-square w-full" />
+
+              <p className="relative z-10 pb-5 text-center font-display text-sm font-semibold text-ink-soft">
+                {productPage.viewerHint}
+              </p>
+
+              <Badge tone="red" className="absolute top-5 left-5 z-10">
+                Vue 3D interactive
+              </Badge>
+            </div>
+
+            <div className="mt-4 grid grid-cols-3 gap-3">
+              <VideoBlock ratio="aspect-square" tone="yellow" />
+              <VideoBlock ratio="aspect-square" tone="blue" />
+              <VideoBlock ratio="aspect-square" tone="green" />
+            </div>
+          </div>
+
+          {/* ---------------- Boîte d'achat ---------------- */}
+          <div id="buy-box" className="flex flex-col gap-7">
+            <div>
+              <p className="font-mono text-sm tracking-widest text-pop-red uppercase">{productPage.eyebrow}</p>
+              <h1 className="mt-2 text-[clamp(2.4rem,5.5vw,3.6rem)]">{productPage.title}</h1>
+              <p className="mt-3 text-lg text-ink-soft md:text-xl">{productPage.tagline}</p>
+            </div>
+
+            <ul className="flex flex-col gap-2.5">
+              {productPage.bullets.map((bullet) => (
+                <li key={bullet} className="flex items-start gap-2.5">
+                  <span className="mt-2 size-2 shrink-0 rounded-full bg-pop-green" aria-hidden />
+                  <span className="leading-relaxed">{bullet}</span>
+                </li>
+              ))}
+            </ul>
+
+            <hr className="border-t-2 border-dashed border-ink/25" />
+
+            <section aria-labelledby="pack-title" className="flex flex-col gap-3">
+              <h2 id="pack-title" className="font-display text-lg font-bold">
+                {productPage.bundleLabel}
+              </h2>
+              <BundlePicker value={bundleId} onChange={setPickedBundle} />
+            </section>
+
+            <section aria-labelledby="color-title" className="flex flex-col gap-4">
+              <h2 id="color-title" className="font-display text-lg font-bold">
+                {productPage.colorLabel}
+              </h2>
+              {selectedColors.map((slug, i) => (
+                <ColorPicker
+                  key={i}
+                  groupId={`unit-${i}`}
+                  value={slug}
+                  label={bundle.quantity > 1 ? `Appareil ${i + 1}` : undefined}
+                  onChange={(next) =>
+                    setColorPool((prev) => prev.map((c, j) => (j === i ? next : c)))
+                  }
+                />
+              ))}
+            </section>
+
+            <div className="rounded-[2rem] border-3 border-ink bg-paper p-6 shadow-pop">
+              <div className="flex flex-wrap items-end justify-between gap-3">
+                <div>
+                  <p className="font-display text-4xl leading-none font-bold">
+                    {formatPrice(bundle.priceCents)}
+                  </p>
+                  <p className="mt-1.5 text-sm text-ink-soft">
+                    {bundle.quantity > 1 && <>soit {formatPrice(unitPrice)} l’unité · </>}TTC,
+                    livraison {bundle.priceCents >= site.freeShippingThresholdCents ? 'offerte' : 'en sus'}
+                  </p>
+                </div>
+                {saving > 0 && (
+                  <span className="rounded-full border-3 border-ink bg-pop-green px-3.5 py-1.5 font-display text-sm font-bold">
+                    −{formatPrice(saving)}
+                  </span>
+                )}
+              </div>
+
+              <Button
+                variant="primary"
+                size="lg"
+                shine
+                className="mt-5 w-full"
+                onClick={handleAdd}
+                aria-live="polite"
+              >
+                <AnimatePresence mode="wait" initial={false}>
+                  {justAdded ? (
+                    <motion.span
+                      key="added"
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      className="flex items-center gap-2"
+                    >
+                      Ajouté au panier ✓
+                    </motion.span>
+                  ) : (
+                    <motion.span
+                      key="add"
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                    >
+                      Ajouter au panier
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </Button>
+
+              <ul className="mt-5 grid gap-2.5 text-sm sm:grid-cols-2">
+                {[
+                  '📦 Expédié sous 24 h ouvrées',
+                  '↩️ 30 jours pour changer d’avis',
+                  '🛡️ Garantie 12 mois',
+                  '🔒 Paiement sécurisé Stripe',
+                ].map((item) => (
+                  <li key={item} className="flex items-center gap-2 text-ink-soft">
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* ---------------- Caractéristiques ---------------- */}
+            <section aria-labelledby="specs-title" className="rounded-[2rem] border-3 border-ink bg-cream-deep p-6">
+              <h2 id="specs-title" className="font-display text-lg font-bold">
+                Caractéristiques
+              </h2>
+              <dl className="mt-4 divide-y-2 divide-dashed divide-ink/20">
+                {specs.map((spec) => (
+                  <div key={spec.label} className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 py-3">
+                    <dt className="font-display font-bold">{spec.label}</dt>
+                    <dd className="text-right">
+                      <span className="font-mono text-sm">{spec.value}</span>
+                      {spec.note && <span className="block text-xs text-ink-soft">{spec.note}</span>}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+              <p className="mt-4 text-xs leading-relaxed text-ink-soft">
+                Valeurs communiquées par le fabricant, mesurées en conditions normales
+                d’utilisation. L’autonomie varie selon la température et la proportion de vidéo.
+              </p>
+            </section>
+
+            <p className="text-center text-sm text-ink-soft">
+              Une question avant de commander ?{' '}
+              <Link href="/#faq" className="font-semibold underline underline-offset-2">
+                Voir les réponses
+              </Link>{' '}
+              ou{' '}
+              <a href={`mailto:${site.email}`} className="font-semibold underline underline-offset-2">
+                nous écrire
+              </a>
+              .
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* ---------------- Barre d'achat mobile ---------------- */}
+      <AnimatePresence>
+        {showStickyBar && (
+          <motion.div
+            initial={{ y: 100 }}
+            animate={{ y: 0 }}
+            exit={{ y: 100 }}
+            transition={{ type: 'spring', stiffness: 320, damping: 32 }}
+            className="fixed inset-x-0 bottom-0 z-70 border-t-3 border-ink bg-paper px-4 py-3 lg:hidden"
+          >
+            <div className="mx-auto flex max-w-2xl items-center gap-3">
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-display font-bold">{bundle.name}</p>
+                <p className="font-mono text-sm">{formatPrice(bundle.priceCents)}</p>
+              </div>
+              <Button variant="primary" size="sm" onClick={handleAdd} className="shrink-0">
+                {justAdded ? 'Ajouté ✓' : 'Ajouter'}
+              </Button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  )
+}

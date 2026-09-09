@@ -7,7 +7,7 @@ export const site = {
   name: 'Moments Caméra',
   tagline: 'Le porte-clés qui prend de vraies photos',
   description:
-    "Un appareil photo miniature qui tient sur vos clés. 1080p, photo et vidéo, prêt en une seconde. Capturez les moments que le téléphone vous fait rater.",
+    "Un appareil photo miniature de 26 g qui tient sur vos clés. Vidéo 1080p, grand-angle 130°, prêt en une seconde. Capturez les moments que le téléphone vous fait rater.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://momentscamera.fr',
   locale: 'fr_FR',
   lang: 'fr',

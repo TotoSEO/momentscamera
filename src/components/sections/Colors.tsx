@@ -81,6 +81,16 @@ export function Colors() {
         </div>
 
         <div className="relative aspect-square">
+          {/* Le fond de section prend la couleur choisie : sans ce disque
+              contrastant, un appareil rouge disparaîtrait sur fond rouge.
+              `onHex` est justement la teinte lisible sur ce coloris. */}
+          <motion.div
+            className="pointer-events-none absolute inset-[12%] -z-10 rounded-full blur-2xl"
+            animate={{ backgroundColor: active.onHex }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            style={{ opacity: 0.28 }}
+            aria-hidden
+          />
           <ProductViewer colorway={active} className="size-full" />
           <AnimatePresence mode="wait">
             <motion.p

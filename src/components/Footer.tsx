@@ -49,7 +49,7 @@ export function Footer() {
             </span>
           </div>
           <p className="mt-4 max-w-xs text-sm leading-relaxed text-cream/70">
-            Un appareil photo de 20 grammes accroché à vos clés, pour attraper ce que le téléphone
+            Un appareil photo de 26 grammes accroché à vos clés, pour attraper ce que le téléphone
             vous fait rater.
           </p>
           <div className="mt-5 flex gap-3">

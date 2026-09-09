@@ -76,7 +76,7 @@ export function CameraModel({
     if (flashLight.current) {
       flashLight.current.intensity = THREE.MathUtils.lerp(
         flashLight.current.intensity,
-        flashing ? 12 : 0,
+        flashing ? 3.2 : 0,
         delta * 9,
       )
     }
@@ -102,15 +102,19 @@ export function CameraModel({
       {/* ================= Coque ================= */}
       <RoundedBox args={[W, H, D]} radius={0.11} smoothness={7} castShadow receiveShadow>
         {translucent ? (
+          // `transmission` a besoin d'une carte d'environnement pour être
+          // crédible ; sans elle, la coque sature en blanc pur. Une simple
+          // transparence dépolie rend mieux le boîtier translucide réel,
+          // et laisse voir l'électronique modélisée à l'intérieur.
           <meshPhysicalMaterial
             color={body}
-            transmission={0.84}
-            thickness={0.5}
-            roughness={0.16}
-            ior={1.46}
+            roughness={0.22}
+            metalness={0}
             clearcoat={1}
-            clearcoatRoughness={0.07}
+            clearcoatRoughness={0.06}
             transparent
+            opacity={0.42}
+            depthWrite={false}
           />
         ) : (
           <meshPhysicalMaterial
@@ -124,6 +128,34 @@ export function CameraModel({
         )}
       </RoundedBox>
 
+      {/* Électronique : n'a d'intérêt que sous une coque translucide,
+          où elle donne de la profondeur au lieu d'un vide blanc. */}
+      {translucent && (
+        <group>
+          {/* Carte */}
+          <mesh position={[0, -0.06, 0]}>
+            <boxGeometry args={[W - 0.42, H - 0.42, 0.05]} />
+            <meshStandardMaterial color="#1f6b4a" roughness={0.65} />
+          </mesh>
+          {/* Batterie */}
+          <mesh position={[-0.62, -0.02, 0.12]}>
+            <boxGeometry args={[0.5, 0.44, 0.18]} />
+            <meshStandardMaterial color="#2a2731" roughness={0.5} metalness={0.3} />
+          </mesh>
+          {/* Composants */}
+          {[
+            [0.72, 0.2],
+            [0.86, -0.16],
+            [0.2, 0.24],
+          ].map(([x, y]) => (
+            <mesh key={`${x}-${y}`} position={[x, y, 0.05]}>
+              <boxGeometry args={[0.14, 0.1, 0.06]} />
+              <meshStandardMaterial color="#14121a" roughness={0.7} />
+            </mesh>
+          ))}
+        </group>
+      )}
+
       {/* ================= Face avant imprimée ================= */}
       <mesh position={[0, 0, FRONT + 0.002]}>
         <planeGeometry args={[W - 0.09, H - 0.09]} />
@@ -134,7 +166,7 @@ export function CameraModel({
           clearcoatRoughness={0.4}
           envMapIntensity={0.28}
           transparent={translucent}
-          opacity={translucent ? 0.88 : 1}
+          opacity={translucent ? 0.72 : 1}
         />
       </mesh>
 
@@ -246,10 +278,10 @@ export function CameraModel({
       {/* Lumière du flash : n'existe qu'au moment du déclenchement. */}
       <pointLight
         ref={flashLight}
-        position={[LENS_X, 0, 2]}
+        position={[LENS_X, 0, 1.5]}
         intensity={0}
         color="#fff6d0"
-        distance={9}
+        distance={5}
         decay={2}
       />
     </group>

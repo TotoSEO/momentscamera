@@ -131,10 +131,10 @@ export function Hero() {
               1080p
             </FloatingTag>
             <FloatingTag className="right-0 top-[34%]" delay={1.2} tone="blue">
-              20 g
+              26 g
             </FloatingTag>
             <FloatingTag className="left-[6%] bottom-[16%]" delay={1.4} tone="green">
-              1 bouton
+              Grand-angle 130°
             </FloatingTag>
           </motion.div>
 

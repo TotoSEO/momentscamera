@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { AnimatePresence, motion } from 'motion/react'
 import type { Colorway } from '@/content/product'
 import { cn } from '@/lib/cn'
+import { assetPath } from '@/lib/asset'
 
 /**
  * Photo fabricant du coloris sélectionné.
@@ -51,7 +52,7 @@ export function ProductPhoto({
           className="absolute inset-0"
         >
           <Image
-            src={colorway.photo}
+            src={assetPath(colorway.photo)}
             alt={`Appareil photo porte-clés Moments Caméra, coloris ${colorway.name}, vu de face et de dos`}
             fill
             sizes={sizes}

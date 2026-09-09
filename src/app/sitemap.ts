@@ -1,6 +1,9 @@
 import type { MetadataRoute } from 'next'
 import { routes, site } from '@/lib/site'
 
+/** Généré à la compilation : indispensable sous `output: export`. */
+export const dynamic = 'force-static'
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date()
 

@@ -52,15 +52,14 @@ export const metadata: Metadata = {
     siteName: site.name,
     title: `${site.name} — ${site.tagline}`,
     description: site.description,
-    images: [{ url: '/og.svg', width: 1200, height: 630, alt: site.tagline }],
+    images: [{ url: `${site.url}/og.svg`, width: 1200, height: 630, alt: site.tagline }],
   },
   twitter: {
     card: 'summary_large_image',
     title: `${site.name} — ${site.tagline}`,
     description: site.description,
-    images: ['/og.svg'],
+    images: [`${site.url}/og.svg`],
   },
-  icons: { icon: '/icon.svg', shortcut: '/icon.svg', apple: '/icon.svg' },
   robots: { index: true, follow: true },
   alternates: { canonical: '/' },
 }

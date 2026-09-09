@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from 'motion/react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { useCart, cartTotals } from '@/lib/cart-store'
 import { formatPrice, routes, site } from '@/lib/site'
@@ -16,6 +17,7 @@ import { getColorway } from '@/content/product'
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const { lines, isOpen, close, setQuantity, remove } = useCart()
   const totals = cartTotals(lines)
+  const router = useRouter()
 
   // Verrouille le scroll de la page derrière le tiroir.
   useEffect(() => {
@@ -179,7 +181,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
                     className="w-full"
                     onClick={() => {
                       close()
-                      window.location.href = routes.cart
+                      // `router.push` respecte le basePath ; `window.location`
+                      // l'ignorerait et sortirait du site en sous-répertoire.
+                      router.push(routes.cart)
                     }}
                   >
                     Passer commande

@@ -15,6 +15,15 @@ La boutique fonctionne **sans aucune clé** : le tunnel de paiement bascule
 alors en mode démonstration, ce qui permet de tester le parcours complet
 avant d’ouvrir un compte marchand.
 
+> **Hébergement — à lire avant de mettre en ligne.**
+> La boutique a besoin d’un serveur pour encaisser : `/api/checkout` crée la
+> session Stripe et `/api/stripe/webhook` reçoit les paiements. **GitHub Pages
+> ne sert que des fichiers et ne peut donc pas les exécuter.** Le dépôt publie
+> un aperçu statique sur Pages (le site s’affiche, la 3D tourne, le paiement
+> est explicitement désactivé), mais pour vendre, déployez sur Vercel ou
+> équivalent — trois clics, gratuit, aucun changement de code. Marche à
+> suivre : [`docs/DEPLOIEMENT.md`](docs/DEPLOIEMENT.md).
+
 ---
 
 ## Ce qu’il y a dedans
@@ -39,6 +48,7 @@ avant d’ouvrir un compte marchand.
 | [`docs/PAYMENTS.md`](docs/PAYMENTS.md) | Stripe, webhooks, TVA, alternatives |
 | [`docs/ALIBABA-SOURCING.md`](docs/ALIBABA-SOURCING.md) | Fournisseur, marges, import, automatisation |
 | [`docs/MEDIAS.md`](docs/MEDIAS.md) | Intégrer vidéos, photos et modèle 3D |
+| [`docs/DEPLOIEMENT.md`](docs/DEPLOIEMENT.md) | Où héberger — et pourquoi GitHub Pages ne peut pas encaisser |
 
 ## Où modifier quoi
 

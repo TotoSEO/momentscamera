@@ -15,6 +15,9 @@ export function CartPageClient() {
   const { lines, setQuantity, remove } = useCart()
   const totals = cartTotals(lines)
 
+  // Un export statique n'a pas de route API : inutile de laisser le
+  // visiteur cliquer sur un bouton qui ne peut pas aboutir.
+  const isStaticPreview = process.env.NEXT_PUBLIC_STATIC_PREVIEW === 'true'
   const mounted = useHydrated()
   const cancelled = useSearchParam('annule') !== null
   const [loading, setLoading] = useState(false)
@@ -193,16 +196,27 @@ export function CartPageClient() {
               <p className="text-xs text-ink-soft">TVA incluse</p>
             </dl>
 
-            <Button
-              variant="primary"
-              size="lg"
-              shine
-              className="mt-6 w-full"
-              onClick={checkout}
-              disabled={loading}
-            >
-              {loading ? 'Redirection…' : 'Payer maintenant'}
-            </Button>
+            {isStaticPreview ? (
+              <div className="mt-6 rounded-[1.5rem] border-3 border-dashed border-ink bg-pop-yellow/60 px-5 py-4 text-sm leading-relaxed">
+                <p className="font-display font-bold">Aperçu — paiement indisponible</p>
+                <p className="mt-1.5">
+                  Cette version est hébergée sur un serveur de fichiers statiques, qui ne peut pas
+                  exécuter le tunnel de paiement. La boutique complète fonctionne dès qu’elle est
+                  déployée sur un hébergeur Next.js.
+                </p>
+              </div>
+            ) : (
+              <Button
+                variant="primary"
+                size="lg"
+                shine
+                className="mt-6 w-full"
+                onClick={checkout}
+                disabled={loading}
+              >
+                {loading ? 'Redirection…' : 'Payer maintenant'}
+              </Button>
+            )}
 
             {error && (
               <p role="alert" className="mt-3 rounded-2xl border-3 border-ink bg-pop-red px-4 py-3 text-sm text-white">

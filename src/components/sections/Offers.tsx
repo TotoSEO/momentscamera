@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { motion } from 'motion/react'
 import { Reveal, RevealGroup, RevealItem } from '@/components/ui/Reveal'
 import { Sticker } from '@/components/ui/Badge'
-import { bundles } from '@/content/product'
+import { bundleUnitPriceCents, bundles } from '@/content/product'
 import { formatPrice, routes } from '@/lib/site'
 
 /** Grille d'offres. Le pack central est mis en avant : ancrage de prix classique. */
@@ -24,16 +24,21 @@ export function Offers() {
           </Reveal>
         </div>
 
-        <RevealGroup className="mt-14 grid items-stretch gap-6 lg:grid-cols-3" stagger={0.1}>
+        <RevealGroup className="mt-14 grid items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-4" stagger={0.09}>
           {bundles.map((bundle) => {
-            const saving = bundle.compareAtCents - bundle.priceCents
+            // Le pack en nombre n'a pas de prix fixe : on annonce son point
+            // d'entrée, le détail se règle sur la fiche produit.
+            const isBulk = bundle.bulk !== undefined
+            const entryQuantity = bundle.bulk?.minQuantity ?? 1
+            const price = bundleUnitPriceCents(bundle, entryQuantity) * (isBulk ? entryQuantity : 1)
+            const saving = bundle.compareAtCents * entryQuantity - price
 
             return (
               <RevealItem key={bundle.id} className="h-full">
                 <motion.div
                   whileHover={{ y: -10 }}
                   transition={{ type: 'spring', stiffness: 300, damping: 22 }}
-                  className={`relative flex h-full flex-col rounded-[2.5rem] border-3 border-ink bg-paper p-8 text-ink ${
+                  className={`relative flex h-full flex-col rounded-[2rem] border-3 border-ink bg-paper p-6 text-ink lg:p-7 ${
                     bundle.highlight ? 'shadow-pop-lg lg:-mt-4 lg:mb-4' : 'shadow-pop'
                   }`}
                 >
@@ -43,16 +48,21 @@ export function Offers() {
                     </Sticker>
                   )}
 
-                  <h3 className="mt-2 text-3xl">{bundle.name}</h3>
+                  <h3 className="mt-2 text-2xl lg:text-3xl">{bundle.name}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-ink-soft">{bundle.pitch}</p>
 
-                  <div className="mt-6 flex items-end gap-3">
-                    <span className="font-display text-5xl leading-none font-bold">
-                      {formatPrice(bundle.priceCents)}
+                  <div className="mt-6 flex flex-wrap items-end gap-x-3 gap-y-1">
+                    {isBulk && (
+                      <span className="w-full font-display text-sm font-bold text-ink-soft">
+                        dès {entryQuantity} appareils
+                      </span>
+                    )}
+                    <span className="font-display text-4xl leading-none font-bold lg:text-[2.6rem]">
+                      {formatPrice(price)}
                     </span>
                     {saving > 0 && (
                       <span className="pb-1 font-mono text-sm text-ink-soft line-through">
-                        {formatPrice(bundle.compareAtCents)}
+                        {formatPrice(bundle.compareAtCents * entryQuantity)}
                       </span>
                     )}
                   </div>

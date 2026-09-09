@@ -30,8 +30,8 @@ avant d’ouvrir un compte marchand.
 
 | | |
 | --- | --- |
-| **Page d’accueil** | Hero 3D, bandeau défilant, bloc problème, fonctionnement, bénéfices, nuancier interactif, mur vidéo, cas d’usage, offres, avis, garanties, FAQ, appel final |
-| **Fiche produit** | Visualiseur 3D collant, sélecteur de pack, un sélecteur de coloris par appareil, boîte d’achat, barre d’achat mobile, caractéristiques |
+| **Page d’accueil** | Hero 3D, bandeau défilant, bloc problème, fonctionnement, bénéfices, nuancier interactif sur photos réelles, mur vidéo, cas d’usage, offres, garanties, FAQ, appel final |
+| **Fiche produit** | Photos réelles du coloris choisi (vue 3D en option), sélecteur de pack, un coloris par appareil, pack à quantité libre jusqu’à 100, boîte d’achat, barre d’achat mobile, caractéristiques |
 | **Panier** | Tiroir global + page dédiée, persistance `localStorage`, seuil de livraison offerte |
 | **Paiement** | Stripe Checkout, prix recalculés côté serveur, webhook signé et idempotent |
 | **Expédition** | Interface `FulfillmentProvider` : manuel, webhook, ou API Alibaba |
@@ -58,7 +58,6 @@ avant d’ouvrir un compte marchand.
 | Une couleur du produit | `src/content/product.ts` → `colorways` |
 | Un texte marketing | `src/content/copy.ts` |
 | Une réponse de FAQ | `src/content/faq.ts` |
-| Les avis clients | `src/content/reviews.ts` |
 | Un délai, une garantie, un seuil | `src/lib/site.ts` |
 | La charte graphique | `src/app/globals.css` → bloc `@theme` |
 | Le modèle 3D | `src/components/three/CameraModel.tsx` |
@@ -89,9 +88,11 @@ Six points bloquants, dans l’ordre :
    — voir `SPECS_NEED_SUPPLIER_CONFIRMATION` dans `src/content/product.ts`.
    Commandez un échantillon et faites-vous envoyer une fiche technique
    écrite.
-3. **Remplacer les avis de démonstration.** Ils sont clairement étiquetés
-   tant que `REVIEWS_ARE_DEMO` vaut `true`. Publier de faux avis est une
-   pratique commerciale trompeuse.
+3. **Brancher de vrais avis clients.** La section avis a été retirée : il
+   n'y a aucun avis inventé sur le site. Publier de faux avis est une
+   pratique commerciale trompeuse (art. L121-2 du Code de la consommation),
+   punie jusqu'à 300 000 €. Une base Supabase alimentée par les acheteurs
+   réels est prévue.
 4. **Vérifier la conformité CE / RoHS / DEEE / batteries** pour la vente
    dans l’Union européenne. Détails dans `docs/ALIBABA-SOURCING.md`.
 5. **Tenir les promesses affichées** : 3-5 jours, 30 jours de

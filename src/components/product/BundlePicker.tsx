@@ -1,22 +1,29 @@
 'use client'
 
 import { motion } from 'motion/react'
-import { bundles, type Bundle } from '@/content/product'
+import { bundleUnitPriceCents, bundles, type Bundle } from '@/content/product'
 import { formatPrice } from '@/lib/site'
 
 export function BundlePicker({
   value,
   onChange,
+  bulkQuantity,
 }: {
   value: Bundle['id']
   onChange: (id: Bundle['id']) => void
+  /** Quantité en cours sur le pack en nombre, pour afficher son vrai prix. */
+  bulkQuantity: number
 }) {
   return (
     <div role="radiogroup" aria-label="Choisissez votre pack" className="flex flex-col gap-3">
       {bundles.map((bundle) => {
         const active = bundle.id === value
-        const saving = bundle.compareAtCents - bundle.priceCents
-        const unitPrice = bundle.priceCents / bundle.quantity
+        const isBulk = bundle.bulk !== undefined
+        const quantity = isBulk ? bulkQuantity : 1
+        const unitPrice = bundleUnitPriceCents(bundle, quantity)
+        const devices = bundle.quantity * quantity
+        const total = unitPrice * quantity
+        const saving = bundle.compareAtCents * (isBulk ? quantity : 1) - total
 
         return (
           <motion.button
@@ -49,18 +56,17 @@ export function BundlePicker({
                 )}
               </span>
               <span className="mt-0.5 block text-sm text-ink-soft">
-                {bundle.quantity} appareil{bundle.quantity > 1 ? 's' : ''} ·{' '}
-                {formatPrice(Math.round(unitPrice))} l’unité
+                {devices} appareil{devices > 1 ? 's' : ''} · {formatPrice(unitPrice)} l’unité
               </span>
             </span>
 
             <span className="shrink-0 text-right">
               <span className="block font-display text-xl leading-none font-bold">
-                {formatPrice(bundle.priceCents)}
+                {formatPrice(total)}
               </span>
               {saving > 0 && (
                 <span className="mt-1 block font-mono text-xs text-ink-soft line-through">
-                  {formatPrice(bundle.compareAtCents)}
+                  {formatPrice(bundle.compareAtCents * (isBulk ? quantity : 1))}
                 </span>
               )}
             </span>

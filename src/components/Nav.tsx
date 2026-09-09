@@ -4,9 +4,11 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { motion, useScroll, useMotionValueEvent } from 'motion/react'
 import { useCart, cartTotals } from '@/lib/cart-store'
-import { routes, site } from '@/lib/site'
+import { formatPrice, routes, site } from '@/lib/site'
+import { product } from '@/content/product'
 import { useHydrated } from '@/lib/client-state'
 import { CameraGlyph } from '@/components/ui/CameraGlyph'
+import { MobileMenu } from '@/components/MobileMenu'
 
 const links = [
   { href: routes.product, label: 'Le produit' },
@@ -17,6 +19,7 @@ const links = [
 
 export function Nav() {
   const [scrolled, setScrolled] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
   const { scrollY } = useScroll()
   const { toggle, lines } = useCart()
   const { itemCount } = cartTotals(lines)
@@ -34,7 +37,7 @@ export function Nav() {
       style={{ backdropFilter: scrolled ? 'blur(8px)' : 'none' }}
     >
       <nav className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 md:px-8">
-        <Link href={routes.home} className="flex items-center gap-2.5" aria-label={`${site.name} — accueil`}>
+        <Link href={routes.home} className="flex items-center gap-2.5" aria-label={`${site.name}, accueil`}>
           <CameraGlyph className="w-11" />
           <span className="font-display text-xl leading-none font-bold md:text-2xl">
             Moments<span className="text-pop-red">.</span>
@@ -55,11 +58,20 @@ export function Nav() {
         </ul>
 
         <div className="flex items-center gap-2.5">
+          <button
+            onClick={() => setMenuOpen(true)}
+            aria-label="Ouvrir le menu"
+            aria-expanded={menuOpen}
+            className="grid size-11 place-items-center rounded-full border-3 border-ink bg-paper shadow-pop-sm transition-transform hover:-translate-y-0.5 lg:hidden"
+          >
+            <MenuIcon />
+          </button>
+
           <Link
             href={routes.product}
             className="hidden rounded-full border-3 border-ink bg-pop-yellow px-5 py-2 font-display text-sm font-bold shadow-pop-sm transition-transform hover:-translate-y-0.5 sm:inline-flex"
           >
-            À partir de 29,90 €
+            À partir de {formatPrice(product.fromPriceCents)}
           </Link>
 
           <button
@@ -82,7 +94,17 @@ export function Nav() {
           </button>
         </div>
       </nav>
+
+      <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
     </motion.header>
+  )
+}
+
+function MenuIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2.8" aria-hidden>
+      <path d="M4 7h16M4 12h16M4 17h16" strokeLinecap="round" />
+    </svg>
   )
 }
 

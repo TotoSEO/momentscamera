@@ -6,7 +6,6 @@ import { Colors } from '@/components/sections/Colors'
 import { VideoWall } from '@/components/sections/VideoWall'
 import { UseCases } from '@/components/sections/UseCases'
 import { Offers } from '@/components/sections/Offers'
-import { Reviews } from '@/components/sections/Reviews'
 import { Guarantees } from '@/components/sections/Guarantees'
 import { Faq } from '@/components/sections/Faq'
 import { FinalCta } from '@/components/sections/FinalCta'
@@ -28,7 +27,6 @@ export default function HomePage() {
       <VideoWall />
       <UseCases />
       <Offers />
-      <Reviews />
       <Guarantees />
       <Faq />
       <FinalCta />

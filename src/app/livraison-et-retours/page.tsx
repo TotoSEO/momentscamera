@@ -32,7 +32,7 @@ export default function LivraisonPage() {
           Si le colis n’est pas arrivé sept jours après la date de livraison annoncée, écrivez à{' '}
           {site.email} avec votre numéro de commande : nous ouvrons une enquête auprès du
           transporteur et réexpédions si nécessaire. En cas de produit endommagé à la réception, une
-          photo suffit — nous remplaçons sans retour préalable.
+          photo suffit, nous remplaçons sans retour préalable.
         </p>
       </LegalSection>
 

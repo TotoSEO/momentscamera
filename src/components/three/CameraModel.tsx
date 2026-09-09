@@ -6,6 +6,7 @@ import { RoundedBox } from '@react-three/drei'
 import * as THREE from 'three'
 import type { Colorway } from '@/content/product'
 import { createFrontDecal, loadPrintImage } from '@/components/three/frontDecal'
+import { basePath } from '@/lib/asset'
 
 /**
  * Modèle 3D du Thumb Camera « 1984 ».
@@ -62,7 +63,7 @@ export function CameraModel({
   useEffect(() => {
     if (process.env.NEXT_PUBLIC_USE_PRINT_IMAGES !== 'true') return
     let alive = true
-    void loadPrintImage(colorway.slug, process.env.NEXT_PUBLIC_BASE_PATH ?? '').then((texture) => {
+    void loadPrintImage(colorway.slug, basePath).then((texture) => {
       if (!alive) {
         texture?.dispose()
         return

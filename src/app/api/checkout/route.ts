@@ -1,7 +1,14 @@
 import { NextResponse } from 'next/server'
 import type Stripe from 'stripe'
 import { getStripe, isPaymentsConfigured } from '@/lib/stripe'
-import { bundles, colorways, getBundle, getColorway } from '@/content/product'
+import {
+  bundleQuantityRange,
+  bundleUnitPriceCents,
+  bundles,
+  colorways,
+  getBundle,
+  getColorway,
+} from '@/content/product'
 import { site } from '@/lib/site'
 
 export const runtime = 'nodejs'
@@ -17,7 +24,6 @@ export const runtime = 'nodejs'
 
 type IncomingLine = { bundleId: unknown; colorSlugs: unknown; quantity: unknown }
 
-const MAX_QUANTITY_PER_LINE = 20
 const MAX_LINES = 10
 
 function badRequest(message: string) {
@@ -50,8 +56,10 @@ export async function POST(request: Request) {
     const bundle = getBundle(raw.bundleId)
     if (!bundle) return badRequest(`Pack inconnu : ${raw.bundleId}`)
 
+    // Les bornes viennent du catalogue, jamais du client.
+    const { min, max } = bundleQuantityRange(bundle)
     const quantity = Number(raw.quantity)
-    if (!Number.isInteger(quantity) || quantity < 1 || quantity > MAX_QUANTITY_PER_LINE) {
+    if (!Number.isInteger(quantity) || quantity < min || quantity > max) {
       return badRequest('Quantité invalide.')
     }
 
@@ -67,16 +75,20 @@ export async function POST(request: Request) {
       colorNames.push(color.name)
     }
 
-    subtotalCents += bundle.priceCents * quantity
+    // Prix recalculé ici, à partir du catalogue et de la quantité :
+    // le pack en nombre applique ses paliers dégressifs.
+    const unitAmount = bundleUnitPriceCents(bundle, quantity)
+    subtotalCents += unitAmount * quantity
 
+    const deviceCount = bundle.quantity * quantity
     lineItems.push({
       quantity,
       price_data: {
         currency: site.currency.toLowerCase(),
-        unit_amount: bundle.priceCents,
+        unit_amount: unitAmount,
         product_data: {
-          name: `${site.name} — ${bundle.name}`,
-          description: `${bundle.quantity} appareil${bundle.quantity > 1 ? 's' : ''} · ${colorNames.join(', ')}`,
+          name: `${site.name} · ${bundle.name}`,
+          description: `${deviceCount} appareil${deviceCount > 1 ? 's' : ''} · ${colorNames.join(', ')}`,
           metadata: { bundle_id: bundle.id, colors: colorNames.join('|') },
         },
       },

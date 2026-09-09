@@ -4,6 +4,8 @@ import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { ProductViewer } from '@/components/product/ProductViewer'
+import { ProductPhoto } from '@/components/product/ProductPhoto'
+import { BulkQuantity } from '@/components/product/BulkQuantity'
 import { ColorPicker } from '@/components/product/ColorPicker'
 import { BundlePicker } from '@/components/product/BundlePicker'
 import { Button } from '@/components/ui/Button'
@@ -13,6 +15,7 @@ import { useCart } from '@/lib/cart-store'
 import { formatPrice, routes, site } from '@/lib/site'
 import { useSearchParam } from '@/lib/client-state'
 import {
+  bundleUnitPriceCents,
   bundles,
   colorways,
   defaultColorway,
@@ -53,6 +56,14 @@ export function ProductPageClient() {
   )
   const selectedColors = colorPool.slice(0, bundle.quantity)
 
+  // Quantité du pack en nombre. Indépendante du pack sélectionné pour que
+  // le client puisse comparer sans perdre son réglage.
+  const [bulkQuantity, setBulkQuantity] = useState(10)
+
+  // Le visuel par défaut est la PHOTO du produit réel ; la 3D est une vue
+  // complémentaire, jamais celle sur laquelle on décide d'acheter.
+  const [view, setView] = useState<'photo' | '3d'>('photo')
+
   const [justAdded, setJustAdded] = useState(false)
   const [showStickyBar, setShowStickyBar] = useState(false)
 
@@ -74,11 +85,15 @@ export function ProductPageClient() {
     [colorPool],
   )
 
-  const unitPrice = Math.round(bundle.priceCents / bundle.quantity)
-  const saving = bundle.compareAtCents - bundle.priceCents
+  const isBulk = bundle.bulk !== undefined
+  const orderQuantity = isBulk ? bulkQuantity : 1
+  const unitPrice = bundleUnitPriceCents(bundle, orderQuantity)
+  const deviceCount = bundle.quantity * orderQuantity
+  const totalPrice = unitPrice * orderQuantity
+  const saving = bundle.compareAtCents * orderQuantity - totalPrice
 
   function handleAdd() {
-    add(bundle.id, selectedColors)
+    add(bundle.id, selectedColors, orderQuantity)
     setJustAdded(true)
     setTimeout(() => setJustAdded(false), 2200)
   }
@@ -106,15 +121,47 @@ export function ProductPageClient() {
                 />
               </div>
 
-              <ProductViewer colorway={previewColorway} className="relative z-10 aspect-square w-full" />
+              {view === 'photo' ? (
+                <ProductPhoto
+                  colorway={previewColorway}
+                  className="relative z-10 aspect-square w-full"
+                  priority
+                />
+              ) : (
+                <>
+                  <ProductViewer colorway={previewColorway} className="relative z-10 aspect-square w-full" />
+                  <p className="relative z-10 px-6 pb-4 text-center text-[11px] leading-snug text-ink-soft">
+                    Modèle 3D non contractuel, fourni pour visualiser les volumes. Les photos
+                    montrent le produit réel.
+                  </p>
+                </>
+              )}
 
-              <p className="relative z-10 pb-5 text-center font-display text-sm font-semibold text-ink-soft">
-                {productPage.viewerHint}
-              </p>
-
-              <Badge tone="red" className="absolute top-5 left-5 z-10">
-                Vue 3D interactive
+              <Badge tone={view === 'photo' ? 'green' : 'red'} className="absolute top-5 left-5 z-10">
+                {view === 'photo' ? 'Photo du produit' : 'Vue 3D interactive'}
               </Badge>
+            </div>
+
+            {/* Bascule entre la photo et la vue 3D. */}
+            <div className="mt-4 flex gap-2">
+              {(
+                [
+                  ['photo', 'Photo réelle'],
+                  ['3d', 'Vue 3D'],
+                ] as const
+              ).map(([id, label]) => (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => setView(id)}
+                  aria-pressed={view === id}
+                  className={`flex-1 rounded-full border-3 border-ink px-4 py-2.5 font-display text-sm font-bold transition-colors ${
+                    view === id ? 'bg-ink text-cream' : 'bg-paper hover:bg-pop-yellow'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
             </div>
 
             <div className="mt-4 grid grid-cols-3 gap-3">
@@ -147,19 +194,33 @@ export function ProductPageClient() {
               <h2 id="pack-title" className="font-display text-lg font-bold">
                 {productPage.bundleLabel}
               </h2>
-              <BundlePicker value={bundleId} onChange={setPickedBundle} />
+              <BundlePicker value={bundleId} onChange={setPickedBundle} bulkQuantity={bulkQuantity} />
+              {isBulk && (
+                <BulkQuantity bundle={bundle} quantity={bulkQuantity} onChange={setBulkQuantity} />
+              )}
             </section>
 
             <section aria-labelledby="color-title" className="flex flex-col gap-4">
               <h2 id="color-title" className="font-display text-lg font-bold">
                 {productPage.colorLabel}
               </h2>
+              {isBulk && (
+                <p className="-mt-1 text-sm text-ink-soft">
+                  Un coloris par lot. Pour panacher, ajoutez plusieurs lots au panier.
+                </p>
+              )}
               {selectedColors.map((slug, i) => (
                 <ColorPicker
                   key={i}
                   groupId={`unit-${i}`}
                   value={slug}
-                  label={bundle.quantity > 1 ? `Appareil ${i + 1}` : undefined}
+                  label={
+                    isBulk
+                      ? `Couleur du lot de ${deviceCount}`
+                      : bundle.quantity > 1
+                        ? `Appareil ${i + 1}`
+                        : undefined
+                  }
                   onChange={(next) =>
                     setColorPool((prev) => prev.map((c, j) => (j === i ? next : c)))
                   }
@@ -171,11 +232,11 @@ export function ProductPageClient() {
               <div className="flex flex-wrap items-end justify-between gap-3">
                 <div>
                   <p className="font-display text-4xl leading-none font-bold">
-                    {formatPrice(bundle.priceCents)}
+                    {formatPrice(totalPrice)}
                   </p>
                   <p className="mt-1.5 text-sm text-ink-soft">
-                    {bundle.quantity > 1 && <>soit {formatPrice(unitPrice)} l’unité · </>}TTC,
-                    livraison {bundle.priceCents >= site.freeShippingThresholdCents ? 'offerte' : 'en sus'}
+                    {deviceCount > 1 && <>soit {formatPrice(unitPrice)} l’unité · </>}TTC, livraison{' '}
+                    {totalPrice >= site.freeShippingThresholdCents ? 'offerte' : 'en sus'}
                   </p>
                 </div>
                 {saving > 0 && (
@@ -280,8 +341,11 @@ export function ProductPageClient() {
           >
             <div className="mx-auto flex max-w-2xl items-center gap-3">
               <div className="min-w-0 flex-1">
-                <p className="truncate font-display font-bold">{bundle.name}</p>
-                <p className="font-mono text-sm">{formatPrice(bundle.priceCents)}</p>
+                <p className="truncate font-display font-bold">
+                  {bundle.name}
+                  {isBulk && <span className="font-normal text-ink-soft"> · {deviceCount}</span>}
+                </p>
+                <p className="font-mono text-sm">{formatPrice(totalPrice)}</p>
               </div>
               <Button variant="primary" size="sm" onClick={handleAdd} className="shrink-0">
                 {justAdded ? 'Ajouté ✓' : 'Ajouter'}

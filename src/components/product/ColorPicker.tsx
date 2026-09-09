@@ -28,7 +28,7 @@ export function ColorPicker({
     <fieldset className={cn('flex flex-col gap-2.5', className)}>
       {label && (
         <legend className="font-display text-sm font-bold">
-          {label} <span className="font-normal text-ink-soft">— {current?.name}</span>
+          {label} <span className="font-normal text-ink-soft">: {current?.name}</span>
         </legend>
       )}
 

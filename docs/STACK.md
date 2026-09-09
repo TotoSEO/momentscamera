@@ -83,6 +83,17 @@ contenu du `<group>` par un `useGLTF()` : l’API de props ne change pas.
   automatique et les transitions. Les sélecteurs de couleur sont des
   `radio` étiquetés, la navigation au clavier est complète.
 
+## À venir : les avis clients
+
+La section avis est absente, volontairement. Elle reviendra branchée sur
+**Supabase**, avec une table `reviews` alimentée uniquement par des
+acheteurs vérifiés (rapprochement sur l'identifiant de session Stripe), une
+politique RLS en lecture publique et écriture authentifiée, et l'affichage
+de la mention de vérification exigée par la directive Omnibus.
+
+Tant que cette chaîne n'existe pas, mieux vaut aucune section avis qu'une
+section inventée.
+
 ## Commandes
 
 ```bash

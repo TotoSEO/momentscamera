@@ -21,20 +21,20 @@ export default function ConfidentialitePage() {
       <LegalSection title="2. Données collectées et finalités">
         <ul className="ml-5 list-disc space-y-2">
           <li>
-            <strong>Commande</strong> — nom, adresse postale, adresse électronique, téléphone. Base
+            <strong>Commande</strong> : nom, adresse postale, adresse électronique, téléphone. Base
             légale : exécution du contrat. Conservation : dix ans (obligation comptable).
           </li>
           <li>
-            <strong>Paiement</strong> — traité intégralement par Stripe Payments Europe, Ltd. Nous
+            <strong>Paiement</strong> : traité intégralement par Stripe Payments Europe, Ltd. Nous
             ne recevons ni ne stockons aucun numéro de carte. Nous ne conservons que l’identifiant
             de transaction.
           </li>
           <li>
-            <strong>Panier</strong> — conservé dans le stockage local de votre navigateur. Ces
+            <strong>Panier</strong> : conservé dans le stockage local de votre navigateur. Ces
             données ne quittent jamais votre appareil et ne nous sont pas transmises.
           </li>
           <li>
-            <strong>Service client</strong> — contenu de vos messages. Base légale : intérêt
+            <strong>Service client</strong> : contenu de vos messages. Base légale : intérêt
             légitime. Conservation : trois ans après le dernier contact.
           </li>
         </ul>

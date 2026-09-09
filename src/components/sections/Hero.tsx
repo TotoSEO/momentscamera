@@ -1,12 +1,13 @@
 'use client'
 
+import Link from 'next/link'
 import { motion, useScroll, useTransform } from 'motion/react'
 import { useRef, useState } from 'react'
 import { ButtonLink } from '@/components/ui/Button'
 import { ProductViewer } from '@/components/product/ProductViewer'
 import { hero } from '@/content/copy'
-import { colorways, defaultColorway } from '@/content/product'
-import { routes } from '@/lib/site'
+import { colorways, defaultColorway, product } from '@/content/product'
+import { formatPrice, routes } from '@/lib/site'
 
 /**
  * Hero.
@@ -107,7 +108,7 @@ export function Hero() {
             className="mt-9 flex flex-col items-center gap-3 sm:flex-row lg:items-start"
           >
             <ButtonLink href={routes.product} variant="primary" size="lg" shine className="w-full sm:w-auto">
-              {hero.primaryCta} — 29,90 €
+              {hero.primaryCta} · {formatPrice(product.fromPriceCents)}
             </ButtonLink>
             <ButtonLink href="#comment" variant="ghost" size="lg" className="w-full sm:w-auto">
               {hero.secondaryCta}
@@ -182,6 +183,12 @@ export function Hero() {
           </div>
           <p className="mt-2.5 text-center font-display text-sm font-semibold text-ink-soft">
             {colorway.name} · faites-le tourner avec le doigt
+          </p>
+          <p className="mt-1 text-center text-[11px] leading-snug text-ink-soft/70">
+            Modèle 3D non contractuel.{' '}
+            <Link href={routes.product} className="underline underline-offset-2 hover:text-ink">
+              Voir les vrais modèles ici
+            </Link>
           </p>
         </motion.div>
       </div>

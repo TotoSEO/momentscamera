@@ -77,6 +77,47 @@ import Image from 'next/image'
 
 Le texte alternatif décrit ce que montre l’image, pas le nom du produit.
 
+## Habillages exacts : utiliser les fichiers d'impression du fabricant
+
+Les neuf sérigraphies sont actuellement **redessinées au vecteur** dans
+`src/components/three/frontDecal.ts`, d'après les visuels produit. Elles en
+reprennent la composition, la palette et les mentions, mais ce sont des
+reproductions : les photos fournisseur sont prises en 3/4, et la perspective
+interdit toute mesure au pixel près.
+
+Pour obtenir l'exactitude parfaite, demandez au fournisseur les **fichiers
+d'impression à plat** (ou de simples photos de face, bien cadrées) :
+
+1. Exportez chaque façade en **1024 × 420 px**, au format PNG.
+2. Nommez chaque fichier d'après le `slug` du coloris et déposez-les dans
+   `public/prints/` :
+
+   ```
+   public/prints/rouge-flash.png
+   public/prints/jaune-pop.png
+   public/prints/bleu-cobalt.png
+   public/prints/vert-lagon.png
+   public/prints/vert-pomme.png
+   public/prints/noir-mat.png
+   public/prints/blanc-craie.png
+   public/prints/gris-galet.png
+   public/prints/transparent.png
+   ```
+
+3. Activez leur usage :
+
+   ```bash
+   NEXT_PUBLIC_USE_PRINT_IMAGES="true"
+   ```
+
+Le modèle 3D chargera alors ces images à la place du dessin, sans aucune
+modification de code. Un fichier manquant retombe automatiquement sur le
+dessin vectoriel : vous pouvez donc n'en fournir que quelques-uns.
+
+Le coloris transparent est un cas particulier : son fond doit rester
+**transparent** dans le PNG (canal alpha), pour que la coque translucide et
+l'électronique restent visibles au travers.
+
 ## Remplacer le modèle 3D par un vrai scan
 
 Le modèle procédural est là pour ne pas bloquer la mise en ligne. Le jour

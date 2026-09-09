@@ -40,9 +40,12 @@ export function Hero() {
         />
       </motion.div>
 
-      <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-[1.05fr_1fr] lg:gap-6">
-        {/* --- Colonne texte --- */}
-        <motion.div style={{ y: textY }} className="relative z-10 text-center lg:text-left">
+      <div className="mx-auto grid max-w-7xl items-center gap-8 lg:grid-cols-[1.05fr_1fr] lg:grid-rows-[auto_auto] lg:gap-x-6 lg:gap-y-0">
+        {/* --- Titre --- */}
+        <motion.div
+          style={{ y: textY }}
+          className="relative z-10 order-1 text-center lg:order-none lg:col-start-1 lg:row-start-1 lg:text-left"
+        >
           <motion.p
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
@@ -78,11 +81,21 @@ export function Hero() {
             ))}
           </h1>
 
+        </motion.div>
+
+        {/* --- Accroche, appels à l'action et réassurance ---
+            En mobile, ce bloc passe APRÈS le visuel : on voit le produit
+            avant de lire son argumentaire. En desktop, il reprend sa place
+            sous le titre, dans la colonne de gauche. */}
+        <motion.div
+          style={{ y: textY }}
+          className="relative z-10 order-3 text-center lg:order-none lg:col-start-1 lg:row-start-2 lg:text-left"
+        >
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.45 }}
-            className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-ink-soft lg:mx-0 md:text-xl"
+            className="mx-auto max-w-xl text-lg leading-relaxed text-ink-soft lg:mx-0 md:text-xl"
           >
             {hero.subtitle}
           </motion.p>
@@ -116,8 +129,13 @@ export function Hero() {
           </motion.ul>
         </motion.div>
 
-        {/* --- Colonne produit --- */}
-        <motion.div style={{ y: productY, opacity: fade }} className="relative">
+        {/* --- Produit en 3D ---
+            Placé juste après le titre en lecture mobile : c'est l'argument
+            principal, il ne doit pas attendre trois paragraphes. */}
+        <motion.div
+          style={{ y: productY, opacity: fade }}
+          className="relative order-2 lg:order-none lg:col-start-2 lg:row-span-2 lg:row-start-1"
+        >
           <motion.div
             initial={{ opacity: 0, scale: 0.85 }}
             animate={{ opacity: 1, scale: 1 }}

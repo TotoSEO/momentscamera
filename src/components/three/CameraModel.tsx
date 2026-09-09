@@ -1,11 +1,11 @@
 'use client'
 
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { RoundedBox } from '@react-three/drei'
 import * as THREE from 'three'
 import type { Colorway } from '@/content/product'
-import { createFrontDecal } from '@/components/three/frontDecal'
+import { createFrontDecal, loadPrintImage } from '@/components/three/frontDecal'
 
 /**
  * Modèle 3D du Thumb Camera « 1984 ».
@@ -34,7 +34,8 @@ const D = 0.81
 const FRONT = D / 2
 const BACK = -D / 2
 const TOP = H / 2
-const LENS_X = 0.28 // objectif décentré vers la droite, comme sur le produit
+const LENS_X = -0.05 // très légèrement à gauche du centre, comme sur le produit
+const LENS_Y = -0.1 // et sous l'axe médian
 
 export function CameraModel({
   colorway,
@@ -48,28 +49,48 @@ export function CameraModel({
   const group = useRef<THREE.Group>(null)
   const ring = useRef<THREE.Mesh>(null)
   const led = useRef<THREE.MeshStandardMaterial>(null)
-  const screen = useRef<THREE.MeshStandardMaterial>(null)
+  const screen = useRef<THREE.MeshPhysicalMaterial>(null)
   const flashLight = useRef<THREE.PointLight>(null)
 
-  // L'habillage est redessiné uniquement quand le coloris change.
-  const decal = useMemo(() => createFrontDecal(colorway), [colorway])
-  useEffect(() => () => decal.dispose(), [decal])
+  // L'habillage vectoriel est redessiné uniquement quand le coloris change.
+  const drawn = useMemo(() => createFrontDecal(colorway), [colorway])
+  useEffect(() => () => drawn.dispose(), [drawn])
+
+  // Si les fichiers d'impression du fabricant sont disponibles, ils
+  // remplacent le dessin. Voir docs/MEDIAS.md § « Habillages exacts ».
+  const [supplied, setSupplied] = useState<THREE.CanvasTexture | null>(null)
+  useEffect(() => {
+    if (process.env.NEXT_PUBLIC_USE_PRINT_IMAGES !== 'true') return
+    let alive = true
+    void loadPrintImage(colorway.slug, process.env.NEXT_PUBLIC_BASE_PATH ?? '').then((texture) => {
+      if (!alive) {
+        texture?.dispose()
+        return
+      }
+      setSupplied(texture)
+    })
+    return () => {
+      alive = false
+      setSupplied(null)
+    }
+  }, [colorway.slug])
+
+  const decal = supplied ?? drawn
 
   useFrame((state, delta) => {
     const t = state.clock.elapsedTime
 
-    if (group.current) {
-      // Balancement plutôt que rotation continue : l'objectif et le
-      // graphisme restent face au visiteur, qui verrait sinon le dos
-      // la moitié du temps.
-      if (autoRotate) {
-        group.current.rotation.y = Math.sin(t * 0.4) * 0.6
-        group.current.rotation.x = Math.sin(t * 0.29) * 0.09
-      }
+    // Balancement d'invitation, tant que personne n'a pris la main.
+    // `autoRotate` repasse à false dès la première manipulation : le modèle
+    // se fige alors sur sa pose courante. Le remettre à zéro annulerait le
+    // geste que le visiteur vient tout juste de faire.
+    if (group.current && autoRotate) {
+      group.current.rotation.y = Math.sin(t * 0.4) * 0.6
+      group.current.rotation.x = Math.sin(t * 0.29) * 0.09
       group.current.position.y = Math.sin(t * 0.9) * 0.04
     }
 
-    if (ring.current) {
+    if (ring.current && autoRotate) {
       ring.current.rotation.y = Math.sin(t * 1.25) * 0.4
     }
 
@@ -88,13 +109,13 @@ export function CameraModel({
       )
     }
     if (screen.current) {
-      // L'écran respire un peu : il a l'air allumé, pas peint.
-      screen.current.emissiveIntensity = 0.5 + Math.sin(t * 2.1) * 0.12
+      // Écran éteint, comme sur les visuels produit : juste un souffle de
+      // veille pour qu'il n'ait pas l'air peint en noir.
+      screen.current.emissiveIntensity = 0.12 + Math.sin(t * 2.1) * 0.05
     }
   })
 
   const body = colorway.hex
-  const shade = colorway.shadeHex
   const translucent = colorway.translucent === true
 
   return (
@@ -106,15 +127,17 @@ export function CameraModel({
           // crédible ; sans elle, la coque sature en blanc pur. Une simple
           // transparence dépolie rend mieux le boîtier translucide réel,
           // et laisse voir l'électronique modélisée à l'intérieur.
+          // Le vernis (`clearcoat`) ajoute un spéculaire qui n'est PAS
+          // atténué par l'opacité : à 1, il repeignait la coque en blanc et
+          // annulait toute transparence. On le réduit fortement.
           <meshPhysicalMaterial
             color={body}
-            roughness={0.22}
+            roughness={0.28}
             metalness={0}
-            clearcoat={1}
-            clearcoatRoughness={0.06}
+            clearcoat={0.22}
+            clearcoatRoughness={0.25}
             transparent
-            opacity={0.42}
-            depthWrite={false}
+            opacity={0.34}
           />
         ) : (
           <meshPhysicalMaterial
@@ -128,85 +151,58 @@ export function CameraModel({
         )}
       </RoundedBox>
 
-      {/* Électronique : n'a d'intérêt que sous une coque translucide,
-          où elle donne de la profondeur au lieu d'un vide blanc. */}
-      {translucent && (
-        <group>
-          {/* Carte */}
-          <mesh position={[0, -0.06, 0]}>
-            <boxGeometry args={[W - 0.42, H - 0.42, 0.05]} />
-            <meshStandardMaterial color="#1f6b4a" roughness={0.65} />
-          </mesh>
-          {/* Batterie */}
-          <mesh position={[-0.62, -0.02, 0.12]}>
-            <boxGeometry args={[0.5, 0.44, 0.18]} />
-            <meshStandardMaterial color="#2a2731" roughness={0.5} metalness={0.3} />
-          </mesh>
-          {/* Composants */}
-          {[
-            [0.72, 0.2],
-            [0.86, -0.16],
-            [0.2, 0.24],
-          ].map(([x, y]) => (
-            <mesh key={`${x}-${y}`} position={[x, y, 0.05]}>
-              <boxGeometry args={[0.14, 0.1, 0.06]} />
-              <meshStandardMaterial color="#14121a" roughness={0.7} />
-            </mesh>
-          ))}
-        </group>
-      )}
-
       {/* ================= Face avant imprimée ================= */}
       <mesh position={[0, 0, FRONT + 0.002]}>
-        <planeGeometry args={[W - 0.09, H - 0.09]} />
+        <planeGeometry args={[W - 0.04, H - 0.04]} />
         <meshPhysicalMaterial
           map={decal}
           roughness={0.55}
           clearcoat={0.12}
           clearcoatRoughness={0.4}
           envMapIntensity={0.28}
-          transparent={translucent}
-          opacity={translucent ? 0.72 : 1}
+          transparent
+          opacity={1}
         />
       </mesh>
 
       {/* Objectif grand-angle 130°, nettement saillant */}
-      <group position={[LENS_X, -0.02, FRONT]}>
+      <group position={[LENS_X, LENS_Y, FRONT]}>
         {/* Embase */}
         <mesh rotation={[Math.PI / 2, 0, 0]} castShadow>
-          <cylinderGeometry args={[0.29, 0.31, 0.06, 56]} />
+          <cylinderGeometry args={[0.225, 0.245, 0.055, 56]} />
           <meshStandardMaterial color="#17151c" roughness={0.4} metalness={0.35} />
         </mesh>
         {/* Fût strié */}
-        <mesh position={[0, 0, 0.05]} rotation={[Math.PI / 2, 0, 0]}>
-          <cylinderGeometry args={[0.25, 0.28, 0.08, 56]} />
+        <mesh position={[0, 0, 0.045]} rotation={[Math.PI / 2, 0, 0]}>
+          <cylinderGeometry args={[0.195, 0.22, 0.07, 56]} />
           <meshStandardMaterial color="#100e15" roughness={0.32} metalness={0.5} />
         </mesh>
         {/* Bague avant */}
-        <mesh position={[0, 0, 0.1]} rotation={[Math.PI / 2, 0, 0]}>
-          <cylinderGeometry args={[0.22, 0.24, 0.05, 56]} />
+        <mesh position={[0, 0, 0.085]} rotation={[Math.PI / 2, 0, 0]}>
+          <cylinderGeometry args={[0.17, 0.19, 0.045, 56]} />
           <meshStandardMaterial color="#26232e" roughness={0.25} metalness={0.7} />
         </mesh>
         {/* Lentille bombée, traitement violacé caractéristique */}
-        <mesh position={[0, 0, 0.13]} rotation={[Math.PI / 2, 0, 0]}>
-          <sphereGeometry args={[0.185, 44, 32, 0, Math.PI * 2, 0, Math.PI / 2.6]} />
+        <mesh position={[0, 0, 0.105]} rotation={[Math.PI / 2, 0, 0]}>
+          <sphereGeometry args={[0.145, 44, 32, 0, Math.PI * 2, 0, Math.PI / 2.6]} />
           <meshPhysicalMaterial
-            color="#120826"
-            roughness={0.03}
-            metalness={0.3}
+            color="#2a1050"
+            roughness={0.02}
+            metalness={0.25}
             clearcoat={1}
             clearcoatRoughness={0}
-            iridescence={0.55}
-            iridescenceIOR={1.7}
-            iridescenceThicknessRange={[240, 400]}
-            envMapIntensity={0.45}
+            iridescence={0.85}
+            iridescenceIOR={2}
+            iridescenceThicknessRange={[260, 520]}
+            emissive="#1b0a3a"
+            emissiveIntensity={0.35}
           />
         </mesh>
       </group>
 
       {/* Éclairage d'appoint (LED), à gauche de l'objectif */}
-      <mesh position={[0.04, -0.28, FRONT + 0.006]}>
-        <sphereGeometry args={[0.055, 20, 20]} />
+      <mesh position={[0.78, 0.3, FRONT + 0.004]}>
+        <sphereGeometry args={[0.022, 14, 14]} />
         <meshStandardMaterial
           ref={led}
           color="#fff9df"
@@ -246,20 +242,21 @@ export function CameraModel({
       {/* Dalle */}
       <mesh position={[0.08, -0.03, BACK - 0.038]} rotation={[0, Math.PI, 0]}>
         <planeGeometry args={[1.14, 0.58]} />
-        <meshStandardMaterial
+        <meshPhysicalMaterial
           ref={screen}
-          color="#0d1b3d"
-          emissive="#4d8dff"
-          emissiveIntensity={0.5}
-          roughness={0.14}
-          toneMapped={false}
+          color="#0a0a0d"
+          emissive="#12305e"
+          emissiveIntensity={0.12}
+          roughness={0.06}
+          clearcoat={1}
+          clearcoatRoughness={0.02}
         />
       </mesh>
       {/* Deux boutons de navigation, à gauche de l'écran */}
       {[0.14, -0.16].map((y) => (
         <mesh key={y} position={[-0.94, y, BACK - 0.02]} rotation={[Math.PI / 2, 0, 0]}>
-          <cylinderGeometry args={[0.055, 0.055, 0.035, 22]} />
-          <meshStandardMaterial color={shade} roughness={0.45} />
+          <cylinderGeometry args={[0.058, 0.058, 0.04, 22]} />
+          <meshStandardMaterial color="#17151c" roughness={0.42} />
         </mesh>
       ))}
 

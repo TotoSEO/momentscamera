@@ -17,6 +17,33 @@ export type ColorwaySlug =
   | 'gris-galet'
   | 'transparent'
 
+/**
+ * Habillage imprimé sur la façade.
+ *
+ * Le fabricant ne recolore pas un motif unique : chaque coloris a sa propre
+ * sérigraphie. Les neuf identifiants ci-dessous correspondent aux neuf
+ * visuels produit, un pour un.
+ */
+export type PrintStyle =
+  /** Triangles Memphis et trames de points, « CAMERA » orange. */
+  | 'memphis-clear'
+  /** Lettres évidées surchargées de portraits au trait continu. */
+  | 'lineart-faces'
+  /** Bandeau horizontal de formes géométriques, liserés cyan. */
+  | 'geo-band'
+  /** Memphis années 80 : zigzags, damiers, flèches. */
+  | 'memphis-80s'
+  /** Synthwave : dégradé rayé, « 1984 » évidé, cassette. */
+  | 'synthwave'
+  /** Bandes arc-en-ciel horizontales barrées d'un swoosh. */
+  | 'rainbow-bands'
+  /** Énorme « CAMERA », l'objectif posé sur le E. */
+  | 'wordmark'
+  /** Composition Bauhaus : demi-disques, arcs, rectangles. */
+  | 'bauhaus'
+  /** Formes tramées sur fond sombre, grand disque cyan. */
+  | 'cosmic-dots'
+
 export type Colorway = {
   slug: ColorwaySlug
   /** Nom commercial affiché au client. */
@@ -27,6 +54,8 @@ export type Colorway = {
   shadeHex: string
   /** Couleur du texte à poser sur `hex` (contraste). */
   onHex: string
+  /** Sérigraphie de la façade — voir `PrintStyle`. */
+  print: PrintStyle
   /** Coque translucide : le rendu 3D bascule en matériau transmissif. */
   translucent?: boolean
   /** Coloris mis en avant par défaut. */
@@ -34,15 +63,15 @@ export type Colorway = {
 }
 
 export const colorways: Colorway[] = [
-  { slug: 'rouge-flash', name: 'Rouge Flash', hex: '#ff4438', shadeHex: '#c02a20', onHex: '#ffffff', featured: true },
-  { slug: 'jaune-pop', name: 'Jaune Pop', hex: '#ffd426', shadeHex: '#d3a600', onHex: '#14121a' },
-  { slug: 'bleu-cobalt', name: 'Bleu Cobalt', hex: '#2f6bff', shadeHex: '#1a44b4', onHex: '#ffffff' },
-  { slug: 'vert-menthe', name: 'Vert Menthe', hex: '#21d07a', shadeHex: '#129153', onHex: '#14121a' },
-  { slug: 'vert-citron', name: 'Vert Citron', hex: '#c8f135', shadeHex: '#96b91d', onHex: '#14121a' },
-  { slug: 'noir-mat', name: 'Noir Mat', hex: '#1c1a22', shadeHex: '#000000', onHex: '#ffffff' },
-  { slug: 'blanc-craie', name: 'Blanc Craie', hex: '#f7f4ee', shadeHex: '#cfc9bd', onHex: '#14121a' },
-  { slug: 'gris-galet', name: 'Gris Galet', hex: '#9a9aa8', shadeHex: '#6c6c7a', onHex: '#14121a' },
-  { slug: 'transparent', name: 'Transparent', hex: '#dff1ff', shadeHex: '#a8cfe6', onHex: '#14121a', translucent: true },
+  { slug: 'rouge-flash', name: 'Rouge Flash', hex: '#e8302a', shadeHex: '#b31f1a', onHex: '#ffffff', print: 'wordmark', featured: true },
+  { slug: 'jaune-pop', name: 'Jaune Pop', hex: '#f2c230', shadeHex: '#c2971a', onHex: '#14121a', print: 'rainbow-bands' },
+  { slug: 'bleu-cobalt', name: 'Bleu Cobalt', hex: '#2b50a8', shadeHex: '#1b3577', onHex: '#ffffff', print: 'geo-band' },
+  { slug: 'vert-menthe', name: 'Vert Lagon', hex: '#3aa79d', shadeHex: '#247a72', onHex: '#ffffff', print: 'lineart-faces' },
+  { slug: 'vert-citron', name: 'Vert Pomme', hex: '#86c443', shadeHex: '#5f9129', onHex: '#14121a', print: 'memphis-80s' },
+  { slug: 'noir-mat', name: 'Noir Mat', hex: '#1a1a1c', shadeHex: '#000000', onHex: '#ffffff', print: 'cosmic-dots' },
+  { slug: 'blanc-craie', name: 'Blanc Craie', hex: '#efeae0', shadeHex: '#c8c2b6', onHex: '#14121a', print: 'bauhaus' },
+  { slug: 'gris-galet', name: 'Gris Galet', hex: '#a9adb2', shadeHex: '#7c8085', onHex: '#14121a', print: 'synthwave' },
+  { slug: 'transparent', name: 'Transparent', hex: '#e6f2fa', shadeHex: '#aecbdd', onHex: '#14121a', print: 'memphis-clear', translucent: true },
 ]
 
 export const defaultColorway = colorways.find((c) => c.featured) ?? colorways[0]

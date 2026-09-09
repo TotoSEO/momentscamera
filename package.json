@@ -1,0 +1,38 @@
+{
+  "name": "moments-camera",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Moments Caméra — e-commerce mono-produit pour l'appareil photo porte-clés 1080P",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "margin": "node --experimental-strip-types scripts/margin.ts"
+  },
+  "dependencies": {
+    "@react-three/drei": "^10.7.8",
+    "@react-three/fiber": "^9.7.0",
+    "@stripe/stripe-js": "^9.16.0",
+    "lenis": "^1.3.26",
+    "motion": "^13.2.0",
+    "next": "^16.3.4",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "stripe": "^22.6.1",
+    "three": "^0.186.0",
+    "zustand": "^5.0.15"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/node": "^22.15.3",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@types/three": "^0.185.0",
+    "eslint": "^9.28.0",
+    "eslint-config-next": "^16.3.4",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^5.9.2"
+  }
+}

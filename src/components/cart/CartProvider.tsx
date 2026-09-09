@@ -93,7 +93,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
                   </div>
                 ) : (
                   <ul className="flex flex-col gap-4">
-                    {totals.resolved.map(({ line, bundleName, colorNames, totalCents }) => (
+                    {totals.resolved.map(({ line, bundleName, colorNames, totalCents, deviceCount, perDeviceCents }) => (
                       <li key={line.id} className="pop-card flex gap-4 p-4">
                         <div className="flex w-16 shrink-0 flex-col gap-1.5">
                           {line.colorSlugs.map((slug, i) => (
@@ -110,6 +110,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
                             <div className="min-w-0">
                               <p className="font-display text-lg leading-tight font-bold">{bundleName}</p>
                               <p className="truncate text-sm text-ink-soft">{colorNames.join(' · ')}</p>
+                              <p className="font-mono text-xs text-ink-soft">
+                                {deviceCount} appareil{deviceCount > 1 ? 's' : ''} ·{' '}
+                                {formatPrice(perDeviceCents)} l’unité
+                              </p>
                             </div>
                             <button
                               onClick={() => remove(line.id)}

@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { motion } from 'motion/react'
 import { Reveal, RevealGroup, RevealItem } from '@/components/ui/Reveal'
 import { Sticker } from '@/components/ui/Badge'
-import { bundleUnitPriceCents, bundles } from '@/content/product'
+import { bundleLinePriceCents, bundles, perDevicePriceCents } from '@/content/product'
 import { formatPrice, routes } from '@/lib/site'
 
 /** Grille d'offres. Le pack central est mis en avant : ancrage de prix classique. */
@@ -30,7 +30,9 @@ export function Offers() {
             // d'entrée, le détail se règle sur la fiche produit.
             const isBulk = bundle.bulk !== undefined
             const entryQuantity = bundle.bulk?.minQuantity ?? 1
-            const price = bundleUnitPriceCents(bundle, entryQuantity) * (isBulk ? entryQuantity : 1)
+            const price = bundleLinePriceCents(bundle, entryQuantity) * (isBulk ? entryQuantity : 1)
+            const perDevice = perDevicePriceCents(bundle, entryQuantity)
+            const devices = bundle.quantity * entryQuantity
             const saving = bundle.compareAtCents * entryQuantity - price
 
             return (
@@ -66,8 +68,11 @@ export function Offers() {
                       </span>
                     )}
                   </div>
+                  <p className="mt-1.5 font-display text-sm font-bold text-ink-soft">
+                    {devices} appareil{devices > 1 ? 's' : ''} · {formatPrice(perDevice)} l’unité
+                  </p>
                   {saving > 0 && (
-                    <p className="mt-1.5 font-display text-sm font-bold text-pop-green-deep">
+                    <p className="mt-0.5 font-display text-sm font-bold text-pop-green-deep">
                       Vous économisez {formatPrice(saving)}
                     </p>
                   )}

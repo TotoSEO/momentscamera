@@ -220,14 +220,18 @@ export const bundles: Bundle[] = [
 ]
 
 /**
- * Prix unitaire d'un pack pour une quantité donnée.
+ * Prix d'UNE unité de commande, c'est-à-dire le montant facturé pour chaque
+ * incrément de quantité.
  *
- * Les packs à quantité fixe ignorent la quantité ; seul le pack en nombre
- * applique ses paliers. Cette fonction est la SEULE source de vérité du
- * prix : le panier et la route de paiement l'appellent tous les deux, pour
- * qu'un écart de calcul soit impossible.
+ * Pour un pack à quantité fixe, l'unité de commande est le pack entier : le
+ * Duo vaut 31,99 € quel que soit le nombre de Duos commandés. Pour le pack
+ * en nombre, l'unité de commande est un appareil, et son prix suit les
+ * paliers dégressifs.
+ *
+ * C'est ce montant que Stripe reçoit en `unit_amount`. Ce n'est PAS le prix
+ * par appareil : pour l'afficher, voir `perDevicePriceCents`.
  */
-export function bundleUnitPriceCents(bundle: Bundle, quantity: number): number {
+export function bundleLinePriceCents(bundle: Bundle, quantity: number): number {
   if (!bundle.bulk) return bundle.priceCents
 
   const tier = bundle.bulk.tiers.reduce<PriceTier | null>(
@@ -235,6 +239,19 @@ export function bundleUnitPriceCents(bundle: Bundle, quantity: number): number {
     null,
   )
   return tier?.unitPriceCents ?? bundle.priceCents
+}
+
+/**
+ * Prix ramené à un appareil, celui qu'on affiche derrière « l'unité ».
+ *
+ * Le Duo à 31,99 € pour deux appareils fait 16,00 € l'unité. Confondre les
+ * deux revenait à annoncer le prix du pack comme prix unitaire, ce qui
+ * faisait passer les packs pour plus chers que l'achat à l'unité.
+ */
+export function perDevicePriceCents(bundle: Bundle, quantity: number): number {
+  const devices = bundle.quantity * quantity
+  if (devices <= 0) return bundle.priceCents
+  return Math.round((bundleLinePriceCents(bundle, quantity) * quantity) / devices)
 }
 
 /** Bornes de quantité acceptées pour un pack. */

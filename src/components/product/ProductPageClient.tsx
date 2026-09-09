@@ -15,8 +15,9 @@ import { useCart } from '@/lib/cart-store'
 import { formatPrice, routes, site } from '@/lib/site'
 import { useSearchParam } from '@/lib/client-state'
 import {
-  bundleUnitPriceCents,
+  bundleLinePriceCents,
   bundles,
+  perDevicePriceCents,
   colorways,
   defaultColorway,
   getBundle,
@@ -69,15 +70,17 @@ export function ProductPageClient() {
 
   const add = useCart((s) => s.add)
 
-  // Barre d'achat mobile, pilotée par la visibilité de la boîte principale.
+  // Barre d'achat mobile.
+  //
+  // Elle était pilotée par la sortie d'écran de la boîte d'achat, donc
+  // n'apparaissait qu'une fois celle-ci entièrement dépassée : très bas dans
+  // la page, alors que c'est justement pendant la lecture qu'on veut pouvoir
+  // commander. Elle suit maintenant le simple fait d'avoir commencé à lire.
   useEffect(() => {
-    const target = document.getElementById('buy-box')
-    if (!target) return
-    const observer = new IntersectionObserver(([entry]) => setShowStickyBar(!entry.isIntersecting), {
-      threshold: 0,
-    })
-    observer.observe(target)
-    return () => observer.disconnect()
+    const onScroll = () => setShowStickyBar(window.scrollY > 140)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
   const previewColorway = useMemo(
@@ -87,9 +90,9 @@ export function ProductPageClient() {
 
   const isBulk = bundle.bulk !== undefined
   const orderQuantity = isBulk ? bulkQuantity : 1
-  const unitPrice = bundleUnitPriceCents(bundle, orderQuantity)
   const deviceCount = bundle.quantity * orderQuantity
-  const totalPrice = unitPrice * orderQuantity
+  const totalPrice = bundleLinePriceCents(bundle, orderQuantity) * orderQuantity
+  const unitPrice = perDevicePriceCents(bundle, orderQuantity)
   const saving = bundle.compareAtCents * orderQuantity - totalPrice
 
   function handleAdd() {
@@ -109,7 +112,16 @@ export function ProductPageClient() {
           <span aria-current="page">Appareil photo porte-clés</span>
         </nav>
 
-        <div className="grid gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-14">
+        {/* Identité du produit, avant tout le reste : on doit savoir ce
+            qu'on regarde avant de choisir. */}
+        <header className="mb-6 lg:mb-8">
+          <p className="font-mono text-sm tracking-widest text-pop-red uppercase">
+            {productPage.eyebrow}
+          </p>
+          <h1 className="mt-2 text-[clamp(2.2rem,5.5vw,3.6rem)]">{productPage.title}</h1>
+        </header>
+
+        <div className="grid gap-8 lg:grid-cols-[1.1fr_1fr] lg:gap-14">
           {/* ---------------- Visuel ---------------- */}
           <div className="lg:sticky lg:top-24 lg:self-start">
             <div className="relative overflow-hidden rounded-[2.5rem] border-3 border-ink bg-cream-deep shadow-pop">
@@ -164,43 +176,14 @@ export function ProductPageClient() {
               ))}
             </div>
 
-            <div className="mt-4 grid grid-cols-3 gap-3">
-              <VideoBlock ratio="aspect-square" tone="yellow" />
-              <VideoBlock ratio="aspect-square" tone="blue" />
-              <VideoBlock ratio="aspect-square" tone="green" />
-            </div>
           </div>
 
-          {/* ---------------- Boîte d'achat ---------------- */}
-          <div id="buy-box" className="flex flex-col gap-7">
-            <div>
-              <p className="font-mono text-sm tracking-widest text-pop-red uppercase">{productPage.eyebrow}</p>
-              <h1 className="mt-2 text-[clamp(2.4rem,5.5vw,3.6rem)]">{productPage.title}</h1>
-              <p className="mt-3 text-lg text-ink-soft md:text-xl">{productPage.tagline}</p>
-            </div>
-
-            <ul className="flex flex-col gap-2.5">
-              {productPage.bullets.map((bullet) => (
-                <li key={bullet} className="flex items-start gap-2.5">
-                  <span className="mt-2 size-2 shrink-0 rounded-full bg-pop-green" aria-hidden />
-                  <span className="leading-relaxed">{bullet}</span>
-                </li>
-              ))}
-            </ul>
-
-            <hr className="border-t-2 border-dashed border-ink/25" />
-
-            <section aria-labelledby="pack-title" className="flex flex-col gap-3">
-              <h2 id="pack-title" className="font-display text-lg font-bold">
-                {productPage.bundleLabel}
-              </h2>
-              <BundlePicker value={bundleId} onChange={setPickedBundle} bulkQuantity={bulkQuantity} />
-              {isBulk && (
-                <BulkQuantity bundle={bundle} quantity={bulkQuantity} onChange={setBulkQuantity} />
-              )}
-            </section>
-
-            <section aria-labelledby="color-title" className="flex flex-col gap-4">
+          {/* ---------------- Décisions d'achat ----------------
+              Coloris puis quantité, immédiatement après l'image.
+              L'argumentaire vient après : personne ne lit une fiche
+              technique avant d'avoir choisi sa couleur. */}
+          <div id="buy-box" className="flex flex-col gap-6">
+            <section aria-labelledby="color-title" className="flex flex-col gap-3">
               <h2 id="color-title" className="font-display text-lg font-bold">
                 {productPage.colorLabel}
               </h2>
@@ -226,6 +209,16 @@ export function ProductPageClient() {
                   }
                 />
               ))}
+            </section>
+
+            <section aria-labelledby="pack-title" className="flex flex-col gap-3">
+              <h2 id="pack-title" className="font-display text-lg font-bold">
+                {productPage.bundleLabel}
+              </h2>
+              <BundlePicker value={bundleId} onChange={setPickedBundle} bulkQuantity={bulkQuantity} />
+              {isBulk && (
+                <BulkQuantity bundle={bundle} quantity={bulkQuantity} onChange={setBulkQuantity} />
+              )}
             </section>
 
             <div className="rounded-[2rem] border-3 border-ink bg-paper p-6 shadow-pop">
@@ -292,7 +285,21 @@ export function ProductPageClient() {
               </ul>
             </div>
 
-            {/* ---------------- Caractéristiques ---------------- */}
+            {/* ---------------- Argumentaire et caractéristiques ----------------
+                Après les décisions : ce bloc rassure celui qui hésite encore,
+                il ne doit pas retarder celui qui a déjà choisi. */}
+            <div>
+              <p className="text-lg text-ink-soft md:text-xl">{productPage.tagline}</p>
+              <ul className="mt-4 flex flex-col gap-2.5">
+                {productPage.bullets.map((bullet) => (
+                  <li key={bullet} className="flex items-start gap-2.5">
+                    <span className="mt-2 size-2 shrink-0 rounded-full bg-pop-green" aria-hidden />
+                    <span className="leading-relaxed">{bullet}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
             <section aria-labelledby="specs-title" className="rounded-[2rem] border-3 border-ink bg-cream-deep p-6">
               <h2 id="specs-title" className="font-display text-lg font-bold">
                 Caractéristiques
@@ -326,6 +333,13 @@ export function ProductPageClient() {
               .
             </p>
           </div>
+        </div>
+
+        <div className="mt-10 grid grid-cols-2 gap-3 md:grid-cols-4">
+          <VideoBlock ratio="aspect-square" tone="yellow" />
+          <VideoBlock ratio="aspect-square" tone="blue" />
+          <VideoBlock ratio="aspect-square" tone="green" />
+          <VideoBlock ratio="aspect-square" tone="red" />
         </div>
       </div>
 

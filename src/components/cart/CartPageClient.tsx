@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useCart, cartTotals } from '@/lib/cart-store'
 import { formatPrice, routes, site } from '@/lib/site'
+import { vatRegime } from '@/lib/legal'
 import { useHydrated, useSearchParam } from '@/lib/client-state'
 import { Button, ButtonLink } from '@/components/ui/Button'
 import { CameraGlyph } from '@/components/ui/CameraGlyph'
@@ -199,7 +200,11 @@ export function CartPageClient() {
                 <dt>Total</dt>
                 <dd>{formatPrice(totals.totalCents)}</dd>
               </div>
-              <p className="text-xs text-ink-soft">TVA incluse</p>
+              <p className="text-xs text-ink-soft">
+                {vatRegime === 'franchise'
+                  ? 'Prix net de taxe. TVA non applicable, article 293 B du CGI.'
+                  : 'TVA incluse'}
+              </p>
             </dl>
 
             {isStaticPreview ? (
@@ -223,6 +228,11 @@ export function CartPageClient() {
                 {loading ? 'Redirection…' : 'Payer maintenant'}
               </Button>
             )}
+
+            <p className="mt-3 text-xs leading-relaxed text-ink-soft">
+              Paiement accepté par carte bancaire, Apple&nbsp;Pay et Google&nbsp;Pay. Livraison en
+              France métropolitaine et dans l’Union européenne, hors territoires d’outre-mer.
+            </p>
 
             {error && (
               <p role="alert" className="mt-3 rounded-2xl border-3 border-ink bg-pop-red px-4 py-3 text-sm text-white">

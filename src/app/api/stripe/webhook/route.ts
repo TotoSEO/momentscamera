@@ -104,6 +104,17 @@ export async function POST(request: Request) {
   return NextResponse.json({ received: true })
 }
 
+/**
+ * MANQUE AVANT LA PREMIÈRE VENTE : la confirmation de contrat sur support
+ * durable. L'article L221-13 du Code de la consommation impose d'adresser au
+ * client, au plus tard à la livraison, un récapitulatif reprenant les
+ * informations précontractuelles et le formulaire type de rétractation.
+ *
+ * Le reçu de paiement envoyé par Stripe ne suffit pas : il ne contient ni les
+ * caractéristiques du bien, ni le droit de rétractation, ni le formulaire.
+ * Brancher ici un envoi transactionnel (Resend, Brevo, Postmark) reprenant le
+ * contenu de /livraison-et-retours. Voir docs/LEGAL.md.
+ */
 async function handleCompletedCheckout(stripe: Stripe, session: Stripe.Checkout.Session) {
   // Un paiement différé (virement, prélèvement) arrive `unpaid` :
   // on n'expédie que ce qui est réellement encaissé.

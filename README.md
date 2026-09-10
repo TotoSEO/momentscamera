@@ -49,6 +49,7 @@ avant d’ouvrir un compte marchand.
 | [`docs/ALIBABA-SOURCING.md`](docs/ALIBABA-SOURCING.md) | Fournisseur, marges, import, automatisation |
 | [`docs/MEDIAS.md`](docs/MEDIAS.md) | Intégrer vidéos, photos et modèle 3D |
 | [`docs/DEPLOIEMENT.md`](docs/DEPLOIEMENT.md) | Où héberger — et pourquoi GitHub Pages ne peut pas encaisser |
+| [`docs/LEGAL.md`](docs/LEGAL.md) | Immatriculation, TVA, douane, DEEE : quoi faire avant la première vente |
 
 ## Où modifier quoi
 

@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { Fill, LegalLayout, LegalSection } from '@/components/LegalLayout'
-import { routes, site } from '@/lib/site'
+import { Field, LegalLayout, LegalSection } from '@/components/LegalLayout'
+import { operator, operatorIdentity, vatRegime } from '@/lib/legal'
+import { deliveryRange, routes, site } from '@/lib/site'
 
 export const metadata: Metadata = {
   title: 'Conditions générales de vente',
@@ -11,13 +12,16 @@ export const metadata: Metadata = {
 
 export default function CgvPage() {
   return (
-    <LegalLayout title="Conditions générales de vente" updatedAt="9 septembre 2026">
+    <LegalLayout title="Conditions générales de vente" updatedAt="10 septembre 2026">
       <LegalSection title="1. Objet et champ d’application">
         <p>
           Les présentes conditions régissent les ventes conclues sur {site.url} entre{' '}
-          <Fill>dénomination sociale</Fill> (« le Vendeur ») et toute personne physique non
-          commerçante (« le Client »). Toute commande vaut acceptation sans réserve des présentes
-          conditions, dans leur version en vigueur au jour de la commande.
+          {operatorIdentity()}, dont le siège est situé{' '}
+          <Field value={operator.address} label="adresse postale complète" />, immatriculé sous le
+          numéro SIREN <Field value={operator.siren} label="numéro SIREN" /> (« le Vendeur »), et
+          toute personne physique non commerçante (« le Client »). Toute commande vaut acceptation
+          sans réserve des présentes conditions, dans leur version en vigueur au jour de la
+          commande.
         </p>
       </LegalSection>
 
@@ -34,11 +38,26 @@ export default function CgvPage() {
       </LegalSection>
 
       <LegalSection title="3. Prix">
+        {vatRegime === 'franchise' ? (
+          <p>
+            Les prix sont indiqués en euros, nets de taxe, hors frais de livraison. TVA non
+            applicable, article 293 B du code général des impôts. Les frais de livraison sont
+            affichés avant validation définitive de la commande.
+          </p>
+        ) : (
+          <p>
+            Les prix sont indiqués en euros, toutes taxes comprises, hors frais de livraison. Les
+            frais de livraison sont affichés avant validation définitive de la commande.
+          </p>
+        )}
         <p>
-          Les prix sont indiqués en euros, toutes taxes comprises, hors frais de livraison. Les
-          frais de livraison sont affichés avant validation définitive de la commande. Le Vendeur se
-          réserve le droit de modifier ses prix à tout moment, le prix applicable étant celui en
-          vigueur au moment de la commande.
+          Les produits sont importés depuis un pays situé hors de l’Union européenne. Le prix
+          affiché est un prix rendu destination : les droits de douane et taxes à l’importation sont
+          acquittés par le Vendeur. Aucun supplément ne peut être réclamé au Client à la livraison.
+        </p>
+        <p>
+          Le Vendeur se réserve le droit de modifier ses prix à tout moment, le prix applicable
+          étant celui en vigueur au moment de la commande.
         </p>
       </LegalSection>
 
@@ -56,9 +75,17 @@ export default function CgvPage() {
 
       <LegalSection title="5. Livraison">
         <p>
-          Les produits sont expédiés à l’adresse indiquée par le Client. Le délai indicatif est de 3
-          à 5 jours ouvrés en France métropolitaine. Conformément à l’article L216-1 du Code de la
-          consommation, le Vendeur livre au plus tard trente jours après la conclusion du contrat.
+          Les produits sont expédiés à l’adresse indiquée par le Client. Le délai indicatif est de{' '}
+          {deliveryRange(site.deliveryDays.fr)} en France métropolitaine et de{' '}
+          {deliveryRange(site.deliveryDays.eu)} dans le reste de l’Union européenne. Conformément à
+          l’article L216-1 du Code de la consommation, le Vendeur livre au plus tard trente jours
+          après la conclusion du contrat.
+        </p>
+        <p>
+          Lorsque la commande est expédiée directement par le fournisseur, le Vendeur reste seul
+          responsable de la bonne exécution du contrat à l’égard du Client, conformément à l’article
+          L221-15 du Code de la consommation. L’identité du fournisseur est communiquée sur simple
+          demande à {site.email}.
         </p>
         <p>
           En cas de retard, le Client peut résoudre le contrat par lettre recommandée ou par écrit
@@ -105,7 +132,24 @@ export default function CgvPage() {
         </p>
       </LegalSection>
 
-      <LegalSection title="8. Usage du produit">
+      <LegalSection title="8. Conformité et fin de vie du produit">
+        <p>
+          Les appareils vendus portent le marquage CE et respectent les restrictions applicables aux
+          substances dangereuses. Ils contiennent une batterie lithium intégrée et ne doivent pas
+          être jetés avec les ordures ménagères : ils sont repris gratuitement en déchèterie ou en
+          magasin dans le cadre de la filière des déchets d’équipements électriques et
+          électroniques.
+        </p>
+        <p>
+          Identifiants uniques ADEME du Vendeur, communiqués en application de l’article L541-10-13
+          du Code de l’environnement : filière équipements électriques et électroniques{' '}
+          <Field value={operator.ademe.eee} label="identifiant unique filière EEE" />, filière piles
+          et accumulateurs{' '}
+          <Field value={operator.ademe.batteries} label="identifiant unique filière piles" />.
+        </p>
+      </LegalSection>
+
+      <LegalSection title="9. Usage du produit">
         <p>
           Le produit est un appareil photo et vidéo destiné à un usage personnel et licite. Le Client
           demeure seul responsable de son utilisation. Il est notamment rappelé que la captation de
@@ -114,7 +158,7 @@ export default function CgvPage() {
         </p>
       </LegalSection>
 
-      <LegalSection title="9. Responsabilité">
+      <LegalSection title="10. Responsabilité">
         <p>
           Le Vendeur est de plein droit responsable de la bonne exécution du contrat. Sa
           responsabilité ne saurait toutefois être engagée en cas d’inexécution imputable au Client,
@@ -122,7 +166,7 @@ export default function CgvPage() {
         </p>
       </LegalSection>
 
-      <LegalSection title="10. Données personnelles">
+      <LegalSection title="11. Données personnelles">
         <p>
           Le traitement des données est décrit dans la{' '}
           <Link href={routes.privacy} className="underline underline-offset-2">
@@ -132,7 +176,7 @@ export default function CgvPage() {
         </p>
       </LegalSection>
 
-      <LegalSection title="11. Litiges">
+      <LegalSection title="12. Litiges">
         <p>
           En cas de différend, le Client s’adresse en priorité au service client. À défaut d’accord,
           il peut recourir gratuitement au médiateur de la consommation dont les coordonnées

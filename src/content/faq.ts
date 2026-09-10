@@ -6,6 +6,8 @@
  * Les réponses alimentent aussi le JSON-LD `FAQPage` (SEO).
  */
 
+import { deliveryRange, formatPrice, site } from '@/lib/site'
+
 export type FaqItem = { q: string; a: string }
 
 export const faq: FaqItem[] = [
@@ -43,7 +45,7 @@ export const faq: FaqItem[] = [
   },
   {
     q: 'Quels sont les délais de livraison ?',
-    a: "Comptez 3 à 5 jours ouvrés en France métropolitaine, avec suivi. La livraison est offerte à partir de 40 € d'achat, sinon elle est à 3,90 €. Vous recevez le numéro de suivi par e-mail dès l'expédition.",
+    a: `Comptez ${deliveryRange(site.deliveryDays.fr)} en France métropolitaine, avec suivi. La livraison est offerte à partir de ${formatPrice(site.freeShippingThresholdCents)} d'achat, sinon elle est à ${formatPrice(site.shippingFlatCents)}. Vous recevez le numéro de suivi par e-mail dès l'expédition.`,
   },
   {
     q: 'Et si ça ne me plaît pas ?',

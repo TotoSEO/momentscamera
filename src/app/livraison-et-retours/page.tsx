@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { LegalLayout, LegalSection } from '@/components/LegalLayout'
-import { formatPrice, routes, site } from '@/lib/site'
+import { deliveryRange, formatPrice, routes, site } from '@/lib/site'
 
 export const metadata: Metadata = {
   title: 'Livraison et retours',
@@ -11,11 +11,14 @@ export const metadata: Metadata = {
 
 export default function LivraisonPage() {
   return (
-    <LegalLayout title="Livraison et retours" updatedAt="9 septembre 2026" draft={false}>
+    <LegalLayout title="Livraison et retours" updatedAt="10 septembre 2026" draft={false}>
       <LegalSection title="Délais et tarifs">
         <ul className="ml-5 list-disc space-y-2">
-          <li>France métropolitaine : 3 à 5 jours ouvrés, avec suivi.</li>
-          <li>Belgique, Luxembourg, Suisse et Union européenne : 5 à 8 jours ouvrés.</li>
+          <li>France métropolitaine : {deliveryRange(site.deliveryDays.fr)}, avec suivi.</li>
+          <li>
+            Belgique, Luxembourg, Suisse et Union européenne :{' '}
+            {deliveryRange(site.deliveryDays.eu)}.
+          </li>
           <li>
             Frais : {formatPrice(site.shippingFlatCents)}, offerts dès{' '}
             {formatPrice(site.freeShippingThresholdCents)} d’achat.

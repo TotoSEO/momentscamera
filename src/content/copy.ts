@@ -15,6 +15,8 @@
  * vraiment. Pas de fausse urgence, pas de faux compteurs de stock.
  */
 
+import { deliveryRange, site } from '@/lib/site'
+
 export const hero = {
   eyebrow: '1080p · 26 grammes · Accroché à vos clés',
   title: 'Vos plus beaux moments ne sont pas dans votre téléphone.',
@@ -22,7 +24,11 @@ export const hero = {
     "Moments Caméra est un vrai appareil photo, de la taille d'un pouce, accroché à votre trousseau. Deux boutons, un écran de deux centimètres, un objectif grand-angle. Pas de notification, pas de « attends, je la refais ». Juste le moment, attrapé avant qu'il ne file.",
   primaryCta: 'Je prends le mien',
   secondaryCta: 'Voir ce que ça donne',
-  reassurance: ['Livré en 3 à 5 jours', 'Payé, jamais content : remboursé', '9 couleurs'],
+  reassurance: [
+    `Livré en ${deliveryRange(site.deliveryDays.fr).replace(' ouvrés', '')}`,
+    'Payé, jamais content : remboursé',
+    '9 couleurs',
+  ],
 }
 
 export const marquee = [

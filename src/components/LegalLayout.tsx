@@ -1,18 +1,18 @@
 import Link from 'next/link'
+import { canSellLegally } from '@/lib/legal'
 import { routes } from '@/lib/site'
 
 /**
  * Gabarit des pages légales.
  *
- * Le bandeau d'avertissement s'affiche tant que `draft` est vrai : ces
- * documents engagent juridiquement l'exploitant du site, ils doivent être
- * complétés (et idéalement relus par un professionnel) avant l'ouverture
- * réelle de la boutique.
+ * Le bandeau d'avertissement s'affiche tant que `draft` est vrai. Par défaut il
+ * suit `canSellLegally` : il disparaîtra tout seul le jour où les informations
+ * obligatoires seront renseignées dans src/lib/legal.ts.
  */
 export function LegalLayout({
   title,
   updatedAt,
-  draft = true,
+  draft = !canSellLegally,
   children,
 }: {
   title: string
@@ -35,12 +35,14 @@ export function LegalLayout({
 
       {draft && (
         <div className="mt-8 rounded-[1.5rem] border-3 border-dashed border-ink bg-pop-yellow/60 px-6 py-5">
-          <p className="font-display font-bold">Modèle à compléter avant mise en ligne</p>
+          <p className="font-display font-bold">Document à compléter avant la première vente</p>
           <p className="mt-2 text-sm leading-relaxed">
-            Ce document est une trame conforme à la structure attendue par le droit français, mais
-            les mentions entre crochets doivent être renseignées avec vos informations réelles. Une
-            relecture par un professionnel du droit est vivement recommandée avant d’encaisser la
-            première commande.
+            La structure est conforme à ce qu’exige le droit français, mais les mentions affichées
+            entre crochets doivent être renseignées avec les informations réelles de l’exploitant,
+            dans le fichier <code>src/lib/legal.ts</code>. Certaines d’entre elles (numéro SIREN,
+            adresse, médiateur de la consommation) n’existent qu’une fois l’entreprise immatriculée.
+            Une relecture par un professionnel du droit est vivement recommandée avant d’encaisser
+            la première commande.
           </p>
         </div>
       )}
@@ -60,9 +62,18 @@ export function LegalSection({ title, children }: { title: string; children: Rea
   )
 }
 
-/** Champ à renseigner par l'exploitant. */
+/** Champ à renseigner par l'exploitant, sans valeur connue à ce jour. */
 export function Fill({ children }: { children: React.ReactNode }) {
   return (
     <mark className="rounded-md bg-pop-lime px-1.5 py-0.5 font-mono text-sm">[{children}]</mark>
   )
+}
+
+/**
+ * Affiche une information légale si elle est connue, sinon un marqueur.
+ * Évite d'inventer une donnée que la loi impose d'être exacte.
+ */
+export function Field({ value, label }: { value: string | null | undefined; label: string }) {
+  if (value) return <>{value}</>
+  return <Fill>{label}</Fill>
 }

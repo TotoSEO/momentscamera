@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
-import { Fill, LegalLayout, LegalSection } from '@/components/LegalLayout'
+import { Field, LegalLayout, LegalSection } from '@/components/LegalLayout'
+import { host, operator, vatRegime } from '@/lib/legal'
 import { site } from '@/lib/site'
 
 export const metadata: Metadata = {
@@ -10,20 +11,51 @@ export const metadata: Metadata = {
 
 export default function MentionsLegalesPage() {
   return (
-    <LegalLayout title="Mentions légales" updatedAt="9 septembre 2026">
+    <LegalLayout title="Mentions légales" updatedAt="10 septembre 2026">
       <LegalSection title="1. Éditeur du site">
         <p>
-          Le site {site.name} est édité par <Fill>dénomination sociale</Fill>,{' '}
-          <Fill>forme juridique</Fill> au capital de <Fill>montant</Fill> €, immatriculée au
-          registre du commerce et des sociétés de <Fill>ville</Fill> sous le numéro{' '}
-          <Fill>numéro SIREN</Fill>.
+          Le site {site.name} est édité par {operator.name},{' '}
+          <Field
+            value={
+              operator.legalForm && operator.capitalEuros
+                ? `${operator.legalForm} au capital de ${operator.capitalEuros} €`
+                : operator.legalForm
+            }
+            label="forme juridique, connue après immatriculation"
+          />
+          .
         </p>
         <ul className="ml-5 list-disc space-y-1">
-          <li>Siège social : <Fill>adresse complète</Fill></li>
-          <li>Numéro de TVA intracommunautaire : <Fill>FR00000000000</Fill></li>
-          <li>Adresse électronique : {site.email}</li>
-          <li>Téléphone : <Fill>numéro</Fill></li>
-          <li>Directeur de la publication : <Fill>nom et prénom</Fill></li>
+          <li>
+            Numéro SIREN : <Field value={operator.siren} label="9 chiffres, attribué par l’INSEE" />
+          </li>
+          <li>
+            Immatriculation au registre du commerce et des sociétés de{' '}
+            <Field value={operator.rcsCity} label="ville du greffe" />
+          </li>
+          <li>
+            Numéro de TVA intracommunautaire :{' '}
+            {vatRegime === 'franchise' ? (
+              <span>
+                non applicable, article 293 B du code général des impôts (franchise en base)
+              </span>
+            ) : (
+              <Field value={operator.vatNumber} label="FR + clé + SIREN" />
+            )}
+          </li>
+          <li>
+            Siège social : <Field value={operator.address} label="adresse postale complète" />
+          </li>
+          <li>
+            Adresse électronique :{' '}
+            <a href={`mailto:${operator.email}`} className="underline underline-offset-2">
+              {operator.email}
+            </a>
+          </li>
+          <li>
+            Téléphone : <Field value={operator.phone} label="numéro du service client" />
+          </li>
+          <li>Directeur de la publication : {operator.publicationDirector}</li>
         </ul>
         <p className="text-sm text-ink-soft">
           Ces mentions sont exigées par l’article 6 III de la loi n° 2004-575 du 21 juin 2004 pour
@@ -34,12 +66,33 @@ export default function MentionsLegalesPage() {
 
       <LegalSection title="2. Hébergeur">
         <p>
-          Le site est hébergé par <Fill>nom de l’hébergeur</Fill>, <Fill>adresse</Fill>,{' '}
-          <Fill>téléphone</Fill>.
+          Le site est hébergé par {host.name}, {host.address}.
         </p>
       </LegalSection>
 
-      <LegalSection title="3. Propriété intellectuelle">
+      <LegalSection title="3. Responsabilité élargie du producteur">
+        <p>
+          Un appareil photo et sa batterie relèvent des filières à responsabilité élargie du
+          producteur. Les identifiants uniques délivrés par l’ADEME, prévus à l’article L541-10-13
+          du Code de l’environnement, sont les suivants.
+        </p>
+        <ul className="ml-5 list-disc space-y-1">
+          <li>
+            Équipements électriques et électroniques :{' '}
+            <Field value={operator.ademe.eee} label="identifiant unique filière EEE" />
+          </li>
+          <li>
+            Piles et accumulateurs :{' '}
+            <Field value={operator.ademe.batteries} label="identifiant unique filière piles" />
+          </li>
+          <li>
+            Emballages ménagers :{' '}
+            <Field value={operator.ademe.packaging} label="identifiant unique filière emballages" />
+          </li>
+        </ul>
+      </LegalSection>
+
+      <LegalSection title="4. Propriété intellectuelle">
         <p>
           L’ensemble des éléments composant le site (textes, visuels, modèle tridimensionnel,
           identité graphique, code source) est protégé par le droit de la propriété
@@ -51,7 +104,7 @@ export default function MentionsLegalesPage() {
         </p>
       </LegalSection>
 
-      <LegalSection title="4. Responsabilité">
+      <LegalSection title="5. Responsabilité">
         <p>
           Les informations techniques publiées sur ce site proviennent des données communiquées par
           le fabricant. Elles sont fournies à titre indicatif et peuvent évoluer selon les séries de
@@ -60,11 +113,20 @@ export default function MentionsLegalesPage() {
         </p>
       </LegalSection>
 
-      <LegalSection title="5. Médiation de la consommation">
+      <LegalSection title="6. Médiation de la consommation">
         <p>
           Conformément à l’article L612-1 du Code de la consommation, le consommateur peut recourir
           gratuitement à un médiateur de la consommation en vue de la résolution amiable d’un
-          litige. Le médiateur désigné est <Fill>nom et coordonnées du médiateur</Fill>.
+          litige. Le médiateur désigné est{' '}
+          <Field
+            value={
+              operator.mediator
+                ? `${operator.mediator.name}, ${operator.mediator.address} (${operator.mediator.url})`
+                : null
+            }
+            label="nom, adresse et site du médiateur"
+          />
+          .
         </p>
         <p>
           La plateforme européenne de règlement en ligne des litiges est accessible à l’adresse{' '}

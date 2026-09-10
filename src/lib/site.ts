@@ -22,6 +22,18 @@ export const site = {
   warrantyMonths: 12,
   freeShippingThresholdCents: 4000,
   shippingFlatCents: 390,
+  /**
+   * Délai de livraison annoncé, en jours ouvrés. Valeur unique, reprise par la
+   * FAQ, la page Livraison, les CGV et la page de remerciement.
+   *
+   * Annoncer un délai qu'on ne tient pas est une pratique commerciale trompeuse
+   * (art. L121-2 du Code de la consommation), et le vendeur reste responsable du
+   * délai même lorsque c'est le fournisseur qui expédie (art. L221-15).
+   * Ordres de grandeur : 3 à 5 jours avec du stock en France, 10 à 20 jours en
+   * expédition directe depuis la Chine. À aligner sur le délai réellement
+   * constaté avant d'ouvrir la boutique.
+   */
+  deliveryDays: { fr: [3, 5], eu: [5, 8] },
 } as const
 
 export const routes = {
@@ -35,6 +47,12 @@ export const routes = {
   privacy: '/confidentialite',
   shipping: '/livraison-et-retours',
 } as const
+
+/** Met en forme une plage de délais : « 3 à 5 jours ouvrés ». */
+export function deliveryRange(range: readonly [number, number]): string {
+  const [min, max] = range
+  return min === max ? `${min} jours ouvrés` : `${min} à ${max} jours ouvrés`
+}
 
 export function formatPrice(cents: number, currency = site.currency): string {
   return new Intl.NumberFormat('fr-FR', {

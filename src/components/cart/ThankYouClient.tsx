@@ -5,7 +5,7 @@ import { motion } from 'motion/react'
 import { useCart } from '@/lib/cart-store'
 import { ButtonLink } from '@/components/ui/Button'
 import { CameraGlyph } from '@/components/ui/CameraGlyph'
-import { routes, site } from '@/lib/site'
+import { deliveryRange, routes, site } from '@/lib/site'
 import { useSearchParam } from '@/lib/client-state'
 
 /** Confettis en pastilles : les couleurs du produit, aucune dépendance. */
@@ -69,7 +69,8 @@ export function ThankYouClient() {
           <>
             <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-ink-soft">
               Votre commande est confirmée. Un e-mail de confirmation part à l’instant, et vous
-              recevrez le numéro de suivi dès l’expédition, comptez 3 à 5 jours ouvrés.
+              recevrez le numéro de suivi dès l’expédition, comptez{' '}
+              {deliveryRange(site.deliveryDays.fr)}.
             </p>
             <p className="mt-4 text-sm text-ink-soft">
               Une question ?{' '}

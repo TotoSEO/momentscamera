@@ -32,7 +32,7 @@ export function ColorPicker({
         </legend>
       )}
 
-      <div className="flex flex-wrap gap-2.5">
+      <div className="grid grid-cols-5 justify-items-center gap-2.5 sm:flex sm:flex-wrap sm:justify-items-start">
         {colorways.map((c) => {
           const active = c.slug === value
           return (
@@ -44,7 +44,7 @@ export function ColorPicker({
               aria-label={c.name}
               title={c.name}
               onClick={() => onChange(c.slug)}
-              className="relative grid size-9 place-items-center rounded-full border-3 border-ink transition-transform hover:-translate-y-1"
+              className="relative grid size-10 place-items-center rounded-full border-3 border-ink transition-transform hover:-translate-y-1 sm:size-9"
               style={{ backgroundColor: c.hex }}
             >
               {c.translucent && (

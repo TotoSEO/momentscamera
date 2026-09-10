@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'motion/react'
-import { bundleUnitPriceCents, bundles, type Bundle } from '@/content/product'
+import { bundleLinePriceCents, bundles, perDevicePriceCents, type Bundle } from '@/content/product'
 import { formatPrice } from '@/lib/site'
 
 export function BundlePicker({
@@ -20,9 +20,12 @@ export function BundlePicker({
         const active = bundle.id === value
         const isBulk = bundle.bulk !== undefined
         const quantity = isBulk ? bulkQuantity : 1
-        const unitPrice = bundleUnitPriceCents(bundle, quantity)
+        // Deux prix distincts : celui de la ligne (facturé) et celui ramené
+        // à un appareil (affiché derrière « l'unité »).
+        const linePrice = bundleLinePriceCents(bundle, quantity)
         const devices = bundle.quantity * quantity
-        const total = unitPrice * quantity
+        const total = linePrice * quantity
+        const perDevice = perDevicePriceCents(bundle, quantity)
         const saving = bundle.compareAtCents * (isBulk ? quantity : 1) - total
 
         return (
@@ -56,7 +59,7 @@ export function BundlePicker({
                 )}
               </span>
               <span className="mt-0.5 block text-sm text-ink-soft">
-                {devices} appareil{devices > 1 ? 's' : ''} · {formatPrice(unitPrice)} l’unité
+                {devices} appareil{devices > 1 ? 's' : ''} · {formatPrice(perDevice)} l’unité
               </span>
             </span>
 

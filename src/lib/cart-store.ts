@@ -4,8 +4,9 @@ import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import {
   bundleQuantityRange,
-  bundleUnitPriceCents,
+  bundleLinePriceCents,
   bundles,
+  perDevicePriceCents,
   colorways,
   getBundle,
   getColorway,
@@ -30,6 +31,8 @@ type CartState = {
   add: (bundleId: string, colorSlugs: ColorwaySlug[], quantity?: number) => void
   remove: (id: string) => void
   setQuantity: (id: string, quantity: number) => void
+  /** Change les coloris d'une ligne. La clé de ligne change avec eux. */
+  setColors: (id: string, colorSlugs: ColorwaySlug[]) => void
   clear: () => void
   open: () => void
   close: () => void
@@ -58,6 +61,30 @@ export const useCart = create<CartState>()(
         }),
 
       remove: (id) => set((state) => ({ lines: state.lines.filter((l) => l.id !== id) })),
+
+      setColors: (id, colorSlugs) =>
+        set((state) => {
+          const line = state.lines.find((l) => l.id === id)
+          if (!line) return state
+
+          const nextId = lineId(line.bundleId, colorSlugs)
+          // La couleur fait partie de l'identité de la ligne. Si la nouvelle
+          // combinaison existe déjà au panier, on fusionne les deux plutôt
+          // que de laisser deux lignes identiques cohabiter.
+          const twin = state.lines.find((l) => l.id === nextId && l.id !== id)
+
+          if (twin) {
+            return {
+              lines: state.lines
+                .filter((l) => l.id !== id)
+                .map((l) => (l.id === nextId ? { ...l, quantity: l.quantity + line.quantity } : l)),
+            }
+          }
+
+          return {
+            lines: state.lines.map((l) => (l.id === id ? { ...l, id: nextId, colorSlugs } : l)),
+          }
+        }),
 
       setQuantity: (id, quantity) =>
         set((state) => {
@@ -105,7 +132,10 @@ export type ResolvedLine = {
   line: CartLine
   bundleName: string
   colorNames: string[]
+  /** Montant facturé par unité de commande (le pack, ou l'appareil en nombre). */
   unitPriceCents: number
+  /** Montant ramené à un appareil, pour l'affichage « l'unité ». */
+  perDeviceCents: number
   totalCents: number
   /** Pack à quantité libre : la quantité de ligne est un nombre d'appareils. */
   isBulk: boolean
@@ -120,16 +150,17 @@ export function resolveLine(line: CartLine): ResolvedLine | null {
   const colors = line.colorSlugs.map((slug) => getColorway(slug)).filter((c) => c !== undefined)
   if (colors.length !== bundle.quantity) return null
 
-  // Le prix unitaire vient toujours de `bundleUnitPriceCents` : sur le pack
-  // en nombre, il dépend de la quantité commandée.
-  const unitPriceCents = bundleUnitPriceCents(bundle, line.quantity)
+  // Prix facturé pour une unité de commande. Sur le pack en nombre, il
+  // dépend de la quantité et suit les paliers.
+  const linePriceCents = bundleLinePriceCents(bundle, line.quantity)
 
   return {
     line,
     bundleName: bundle.name,
     colorNames: colors.map((c) => c.name),
-    unitPriceCents,
-    totalCents: unitPriceCents * line.quantity,
+    unitPriceCents: linePriceCents,
+    perDeviceCents: perDevicePriceCents(bundle, line.quantity),
+    totalCents: linePriceCents * line.quantity,
     isBulk: bundle.bulk !== undefined,
     deviceCount: bundle.quantity * line.quantity,
   }

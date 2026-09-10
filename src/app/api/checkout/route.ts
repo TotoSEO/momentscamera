@@ -3,7 +3,7 @@ import type Stripe from 'stripe'
 import { getStripe, isPaymentsConfigured } from '@/lib/stripe'
 import {
   bundleQuantityRange,
-  bundleUnitPriceCents,
+  bundleLinePriceCents,
   bundles,
   colorways,
   getBundle,
@@ -77,7 +77,7 @@ export async function POST(request: Request) {
 
     // Prix recalculé ici, à partir du catalogue et de la quantité :
     // le pack en nombre applique ses paliers dégressifs.
-    const unitAmount = bundleUnitPriceCents(bundle, quantity)
+    const unitAmount = bundleLinePriceCents(bundle, quantity)
     subtotalCents += unitAmount * quantity
 
     const deviceCount = bundle.quantity * quantity

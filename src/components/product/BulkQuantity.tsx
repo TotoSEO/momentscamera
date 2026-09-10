@@ -2,7 +2,7 @@
 
 import { motion } from 'motion/react'
 import type { Bundle } from '@/content/product'
-import { bundleUnitPriceCents } from '@/content/product'
+import { perDevicePriceCents } from '@/content/product'
 import { formatPrice, site } from '@/lib/site'
 
 /**
@@ -25,7 +25,7 @@ export function BulkQuantity({
   if (!bundle.bulk) return null
 
   const { minQuantity, maxQuantity, tiers } = bundle.bulk
-  const unitPrice = bundleUnitPriceCents(bundle, quantity)
+  const unitPrice = perDevicePriceCents(bundle, quantity)
   const nextTier = tiers.find((t) => t.minQuantity > quantity)
   const presets = tiers.map((t) => t.minQuantity)
 

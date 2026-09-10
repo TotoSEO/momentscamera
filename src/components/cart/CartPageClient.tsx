@@ -8,11 +8,12 @@ import { formatPrice, routes, site } from '@/lib/site'
 import { useHydrated, useSearchParam } from '@/lib/client-state'
 import { Button, ButtonLink } from '@/components/ui/Button'
 import { CameraGlyph } from '@/components/ui/CameraGlyph'
+import { LineColorEditor } from '@/components/cart/LineColorEditor'
 import { getColorway } from '@/content/product'
 import { guarantees } from '@/content/copy'
 
 export function CartPageClient() {
-  const { lines, setQuantity, remove } = useCart()
+  const { lines, setQuantity, remove, setColors } = useCart()
   const totals = cartTotals(lines)
 
   // Un export statique n'a pas de route API : inutile de laisser le
@@ -94,7 +95,7 @@ export function CartPageClient() {
           {/* ---------------- Lignes ---------------- */}
           <ul className="flex flex-col gap-4">
             <AnimatePresence initial={false}>
-              {totals.resolved.map(({ line, bundleName, colorNames, unitPriceCents, totalCents }) => (
+              {totals.resolved.map(({ line, bundleName, colorNames, perDeviceCents, totalCents, deviceCount }) => (
                 <motion.li
                   key={line.id}
                   layout
@@ -122,8 +123,13 @@ export function CartPageClient() {
                         <h2 className="text-xl">{bundleName}</h2>
                         <p className="mt-0.5 text-sm text-ink-soft">{colorNames.join(' · ')}</p>
                         <p className="mt-0.5 font-mono text-xs text-ink-soft">
-                          {formatPrice(unitPriceCents)} le pack
+                          {deviceCount} appareil{deviceCount > 1 ? 's' : ''} ·{' '}
+                          {formatPrice(perDeviceCents)} l’unité
                         </p>
+                        <LineColorEditor
+                          colorSlugs={line.colorSlugs}
+                          onChange={(next) => setColors(line.id, next)}
+                        />
                       </div>
                       <button
                         onClick={() => remove(line.id)}

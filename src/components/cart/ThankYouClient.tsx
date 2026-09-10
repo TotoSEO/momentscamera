@@ -68,9 +68,8 @@ export function ThankYouClient() {
         ) : (
           <>
             <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-ink-soft">
-              Votre commande est confirmée. Un e-mail de confirmation part à l’instant, et vous
-              recevrez le numéro de suivi dès l’expédition, comptez{' '}
-              {deliveryRange(site.deliveryDays.fr)}.
+              Votre commande est confirmée. Stripe vous envoie le reçu de paiement, et vous recevrez
+              le numéro de suivi dès l’expédition, comptez {deliveryRange(site.deliveryDays.fr)}.
             </p>
             <p className="mt-4 text-sm text-ink-soft">
               Une question ?{' '}

@@ -184,6 +184,30 @@ pas l'usine.
 La responsabilité civile professionnelle n'est pas obligatoire pour cette
 activité, mais elle est vivement recommandée au vu du point précédent.
 
+## Les obligations qui vivent dans le tunnel de commande
+
+Celles-là ne s'obtiennent auprès d'aucune administration : elles se codent, et
+ce sont les plus faciles à constater depuis un bureau.
+
+**Fait.** Récapitulatif chiffré avant paiement, avec possibilité de corriger le
+panier. Renvoi vers les CGV au moment de valider. Moyens de paiement acceptés et
+zone de livraison affichés au début du processus de commande (art. L221-14).
+Formulaire type de rétractation publié sur la page Livraison et retours
+(art. L221-5 et annexe de l'article R221-1).
+
+**Reste à faire.** La **confirmation du contrat sur support durable**
+(art. L221-13) : un courriel envoyé au plus tard à la livraison, reprenant les
+caractéristiques du bien, le prix, le droit de rétractation et le formulaire type.
+Le reçu de paiement de Stripe ne remplit pas cette obligation, il ne contient rien
+de tout cela. Les CGV du site s'y engagent déjà, il faut donc brancher un envoi
+transactionnel (Resend, Brevo, Postmark) dans
+`src/app/api/stripe/webhook/route.ts`, où un commentaire marque l'emplacement.
+
+**Point de jugement laissé ouvert.** L'acceptation des CGV est aujourd'hui passive
+(« En validant, vous acceptez les conditions générales de vente »). C'est la
+pratique majoritaire et c'est défendable, mais une case à cocher rend
+l'acceptation prouvable en cas de litige, au prix d'un peu de conversion.
+
 ## Ce que font réellement les gens qui se lancent
 
 La question mérite une réponse franche : **la plupart ne font pas ces démarches**.
@@ -295,6 +319,8 @@ Il n'y a donc rien à modifier dans les pages elles-mêmes : renseigner
 - [ ] Déclaration UE de conformité et rapport RoHS reçus du fournisseur
 - [ ] Échantillon commandé et caractéristiques techniques vérifiées
 - [ ] Délai de livraison réel confirmé et reporté dans `site.deliveryDays`
+- [ ] Courriel de confirmation de commande branché (art. L221-13)
+- [ ] Livre des recettes tenu, avec date, montant, mode de paiement et référence
 - [ ] `src/lib/legal.ts` complété, bandeau jaune disparu
 - [ ] Site déployé sur Vercel avec les clés Stripe en production
 - [ ] Pages légales relues par un professionnel

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { LegalLayout, LegalSection } from '@/components/LegalLayout'
+import { Field, LegalLayout, LegalSection } from '@/components/LegalLayout'
+import { operator } from '@/lib/legal'
 import { deliveryRange, formatPrice, routes, site } from '@/lib/site'
 
 export const metadata: Metadata = {
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
 
 export default function LivraisonPage() {
   return (
-    <LegalLayout title="Livraison et retours" updatedAt="10 septembre 2026" draft={false}>
+    <LegalLayout title="Livraison et retours" updatedAt="10 septembre 2026">
       <LegalSection title="Délais et tarifs">
         <ul className="ml-5 list-disc space-y-2">
           <li>France métropolitaine : {deliveryRange(site.deliveryDays.fr)}, avec suivi.</li>
@@ -59,6 +60,34 @@ export default function LivraisonPage() {
           utilisation peut faire l’objet d’une décote, conformément à l’article L221-23 du Code de
           la consommation.
         </p>
+      </LegalSection>
+
+      <LegalSection title="Formulaire type de rétractation">
+        <p className="text-sm text-ink-soft">
+          Ce formulaire est mis à votre disposition en application de l’article L221-5 du Code de la
+          consommation. Son usage n’est pas obligatoire : un simple courriel suffit. Complétez-le et
+          renvoyez-le uniquement si vous souhaitez vous rétracter.
+        </p>
+        <div className="rounded-[1.5rem] border-3 border-ink bg-paper px-6 py-5 font-mono text-sm leading-relaxed">
+          <p>
+            À l’attention de {operator.name},{' '}
+            <Field value={operator.address} label="adresse postale complète" />,{' '}
+            {operator.email} :
+          </p>
+          <p className="mt-4">
+            Je vous notifie par la présente ma rétractation du contrat portant sur la vente du bien
+            ci-dessous :
+          </p>
+          <ul className="mt-4 flex flex-col gap-2">
+            <li>Commandé le : ..................................................</li>
+            <li>Reçu le : ......................................................</li>
+            <li>Numéro de commande : ...........................................</li>
+            <li>Nom du consommateur : ..........................................</li>
+            <li>Adresse du consommateur : ......................................</li>
+            <li>Date : .........................................................</li>
+            <li>Signature (uniquement en cas d’envoi sur papier) : .............</li>
+          </ul>
+        </div>
       </LegalSection>
 
       <LegalSection title="Garantie">

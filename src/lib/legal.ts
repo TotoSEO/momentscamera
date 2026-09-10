@@ -22,14 +22,17 @@ export const operator = {
   /** Nom ou dénomination sociale de l'exploitant, tel qu'il figurera sur les factures. */
   name: 'Thomas Owaller',
   /**
-   * Forme juridique : « Entrepreneur individuel » pour une micro-entreprise,
-   * « SASU au capital de 1 000 € » pour une société. Reste `null` tant qu'aucune
-   * immatriculation n'a été demandée au guichet unique de l'INPI.
+   * Forme juridique. L'exploitant a déjà une micro-entreprise : la forme est donc
+   * connue. Elle ne suffit pas à vendre pour autant, il faut y avoir ajouté une
+   * activité commerciale au guichet unique (voir docs/LEGAL.md, étape 1).
    */
-  legalForm: null as string | null,
+  legalForm: 'Entrepreneur individuel' as string | null,
   /** Capital social en euros. Ne concerne que les sociétés. */
   capitalEuros: null as number | null,
-  /** SIREN à 9 chiffres, attribué par l'INSEE après la déclaration au guichet unique. */
+  /**
+   * SIREN à 9 chiffres. C'est celui de la micro-entreprise existante : il ne
+   * change pas quand on lui ajoute une activité commerciale.
+   */
   siren: null as string | null,
   /** SIRET de l'établissement, soit le SIREN suivi du NIC à 5 chiffres. */
   siret: null as string | null,
